@@ -12,7 +12,7 @@
 ## 项目结构
 
 ```
-├── app.py          # 主应用程序文件
+├── 首页.py          # 主应用程序文件
 ├── utils.py        # 工具类和辅助函数
 ├── requirements.txt # 项目依赖
 ├── README.md       # 项目说明
@@ -29,7 +29,7 @@
    ```
 3. 运行应用：
    ```bash
-   streamlit run app.py
+   streamlit run 首页.py
    ```
 
 ## 使用说明

@@ -1,0 +1,80 @@
+<svg width="1200" height="250" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景渐变 -->
+  <defs>
+    <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#0083B8;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00A3E0;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- 背景 -->
+  <rect width="1200" height="250" fill="url(#bg-gradient)" />
+  
+  <!-- 城市建筑物剪影 -->
+  <g fill="#004a6e">
+    <!-- 建筑1 -->
+    <rect x="50" y="100" width="80" height="150" />
+    <rect x="60" y="70" width="60" height="30" />
+    <rect x="75" y="40" width="30" height="30" />
+    
+    <!-- 建筑2 -->
+    <rect x="150" y="120" width="100" height="130" />
+    <rect x="170" y="80" width="60" height="40" />
+    
+    <!-- 建筑3 - 摩天大楼 -->
+    <rect x="270" y="50" width="70" height="200" />
+    <polygon points="270,50 340,50 305,20" />
+    
+    <!-- 建筑4 - 办公楼 -->
+    <rect x="360" y="90" width="120" height="160" />
+    <rect x="380" y="110" width="20" height="20" />
+    <rect x="420" y="110" width="20" height="20" />
+    <rect x="380" y="150" width="20" height="20" />
+    <rect x="420" y="150" width="20" height="20" />
+    <rect x="380" y="190" width="20" height="20" />
+    <rect x="420" y="190" width="20" height="20" />
+    
+    <!-- 建筑5 - 圆顶建筑 -->
+    <rect x="500" y="130" width="90" height="120" />
+    <ellipse cx="545" cy="130" rx="45" ry="25" />
+    
+    <!-- 建筑6 - 现代建筑 -->
+    <polygon points="610,80 700,80 680,250 630,250" />
+    
+    <!-- 建筑7 - 高层公寓 -->
+    <rect x="720" y="60" width="60" height="190" />
+    <rect x="740" y="30" width="20" height="30" />
+    
+    <!-- 建筑8 - 商业中心 -->
+    <rect x="800" y="100" width="140" height="150" />
+    <polygon points="800,100 940,100 870,60" />
+    
+    <!-- 建筑9 - 住宅楼 -->
+    <rect x="960" y="120" width="70" height="130" />
+    <rect x="970" y="140" width="15" height="15" />
+    <rect x="1000" y="140" width="15" height="15" />
+    <rect x="970" y="170" width="15" height="15" />
+    <rect x="1000" y="170" width="15" height="15" />
+    <rect x="970" y="200" width="15" height="15" />
+    <rect x="1000" y="200" width="15" height="15" />
+    
+    <!-- 建筑10 - 尖顶建筑 -->
+    <rect x="1050" y="110" width="80" height="140" />
+    <polygon points="1050,110 1130,110 1090,60" />
+  </g>
+  
+  <!-- 标题文字 -->
+  <text x="600" y="80" font-family="Arial" font-size="40" font-weight="bold" text-anchor="middle" fill="white">城市建筑物智能识别系统</text>
+  
+  <!-- 副标题 -->
+  <text x="600" y="120" font-family="Arial" font-size="20" text-anchor="middle" fill="white">快速、准确地识别各类建筑物</text>
+  
+  <!-- 装饰元素 - 扫描线 -->
+  <line x1="50" y1="180" x2="1150" y2="180" stroke="rgba(255,255,255,0.5)" stroke-width="2" stroke-dasharray="10,5" />
+  
+  <!-- 装饰元素 - 目标框 -->
+  <rect x="400" y="100" width="140" height="120" fill="none" stroke="#ffffff" stroke-width="2" stroke-dasharray="10,5" />
+  <circle cx="470" cy="160" r="5" fill="#ffffff" />
+  <circle cx="470" cy="160" r="15" fill="none" stroke="#ffffff" stroke-width="2" />
+  <circle cx="470" cy="160" r="25" fill="none" stroke="#ffffff" stroke-width="1" stroke-dasharray="5,3" />
+</svg>

@@ -1,0 +1,24 @@
+<svg width="1200" height="200" viewBox="0 0 1200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0083B8" />
+      <stop offset="100%" stop-color="#00A3E0" />
+    </linearGradient>
+  </defs>
+  
+  <rect width="100%" height="100%" fill="url(#gradient)" />
+  
+  <g transform="translate(50, 50)">
+    <rect x="0" y="50" width="80" height="120" fill="white" opacity="0.8" />
+    <rect x="100" y="30" width="100" height="140" fill="white" opacity="0.8" />
+    <rect x="220" y="10" width="120" height="160" fill="white" opacity="0.8" />
+    
+    <text x="400" y="80" font-family="'Helvetica Neue', sans-serif" font-size="36" font-weight="600" fill="white">单张图片识别系统</text>
+    <text x="400" y="120" font-family="'Helvetica Neue', sans-serif" font-size="18" fill="white" opacity="0.9">上传图片，智能识别建筑物类型</text>
+    
+    <g transform="translate(900, 40)">
+      <circle cx="30" cy="30" r="30" fill="white" opacity="0.8" />
+      <path d="M30 15 L45 45 L15 45 Z" fill="#0083B8" />
+    </g>
+  </g>
+</svg>

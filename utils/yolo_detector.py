@@ -3,17 +3,17 @@ import numpy as np
 from PIL import Image
 import cv2
 from pathlib import Path
+from ultralytics import YOLO
 
 class YOLODetector:
     def __init__(self, model_path=None, device='cuda' if torch.cuda.is_available() else 'cpu'):
         self.device = device
         # 如果没有指定模型路径，使用预训练的YOLOv5模型
         if model_path is None:
-            self.model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
+            self.model = YOLO("yolo11n.pt")  # 使用YOLO11预训练模型
         else:
-            self.model = torch.load(model_path, map_location=device)
+            self.model = YOLO(model_path)  # 加载自定义模型
         self.model.to(device)
-        self.model.eval()
         
         # 建筑物类别
         self.building_classes = [
@@ -46,15 +46,19 @@ class YOLODetector:
         image = self.preprocess_image(image)
         
         # 执行检测
-        results = self.model(image)
+        results = self.model(image, conf=conf_thres)
         
         # 处理检测结果
         detections = []
-        for pred in results.pred[0]:
-            if pred[4] >= conf_thres:  # 置信度过滤
-                x1, y1, x2, y2 = pred[:4].cpu().numpy()
-                conf = float(pred[4])
-                cls_id = int(pred[5])
+        for r in results[0]:
+            boxes = r.boxes
+            for box in boxes:
+                # 获取边界框坐标
+                x1, y1, x2, y2 = box.xyxy[0].cpu().numpy()
+                # 获取置信度
+                conf = float(box.conf)
+                # 获取类别ID
+                cls_id = int(box.cls)
                 
                 # 获取建筑物类别标签
                 label = self.building_classes[cls_id % len(self.building_classes)]

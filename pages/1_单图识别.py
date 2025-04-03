@@ -208,7 +208,7 @@ with col1:
                 detections = detector.detect(image, conf_thres=confidence_threshold)
                 
                 # 在图像上绘制检测结果
-                viz_img = detector.draw_detections(image, detections, show_label=show_label)
+                viz_img = detector.draw_detections(image, detections)
                 
                 # 确保viz_img是RGB格式的numpy数组
                 if isinstance(viz_img, Image.Image):

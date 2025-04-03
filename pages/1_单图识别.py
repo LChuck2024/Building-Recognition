@@ -5,6 +5,7 @@ import numpy as np
 import cv2
 from pathlib import Path
 import time
+import os
 
 # 设置页面配置
 st.set_page_config(
@@ -15,7 +16,8 @@ st.set_page_config(
 )
 
 # 添加页眉图片
-st.image("images/single_header.svg", use_container_width=True)
+image_path = os.path.join(Path(__file__).parent.parent,"images")
+st.image(os.path.join(image_path,"single_header.svg"), use_column_width=True)
 
 # 自定义CSS样式
 st.markdown("""

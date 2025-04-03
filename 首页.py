@@ -98,8 +98,10 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
-
-st.image("images/home_header.svg", use_container_width=True)
+# 使用相对路径导入图片
+# 获取当前文件路径
+current_dir = Path(__file__).parent
+st.image(f"{current_dir}/images/home_header.svg")
 
 # 侧边栏设置
 with st.sidebar:

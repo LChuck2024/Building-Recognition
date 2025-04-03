@@ -2,6 +2,8 @@ import streamlit as st
 import plotly.express as px
 import pandas as pd
 import numpy as np
+import os
+from pathlib import Path
 
 # 设置页面配置
 st.set_page_config(
@@ -60,7 +62,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # 添加页眉图片
-st.image("images/analysis_header.svg", use_container_width=True)
+image_path = os.path.join(Path(__file__).parent.parent,"images")
+st.image(os.path.join(image_path,"analysis_header.svg"), use_column_width=True)
 # 页面标题
 st.title("📊 建筑物特征分析")
 

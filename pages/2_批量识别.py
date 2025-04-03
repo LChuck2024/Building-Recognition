@@ -3,6 +3,8 @@ import pandas as pd
 from datetime import datetime
 import time
 from io import BytesIO
+import os
+from pathlib import Path
 
 # 设置页面配置
 st.set_page_config(
@@ -51,7 +53,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # 添加页眉图片
-st.image("images/batch_header.svg", use_container_width=True)
+image_path = os.path.join(Path(__file__).parent.parent,"images")
+st.image(os.path.join(image_path,"batch_header.svg"), use_column_width=True)
 
 # 页面标题
 st.title("📑 批量建筑物识别")

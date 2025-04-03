@@ -16,9 +16,34 @@ st.set_page_config(
 # 自定义CSS样式
 st.markdown("""
 <style>
+    /* 全局样式 */
+    .main {
+        padding: 1rem;
+        width: 100%;
+        max-width: 100%;
+        margin: 0 auto;
+        box-sizing: border-box;
+    }
+    body {
+        font-family: 'Helvetica Neue', sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+    }
+    
+    /* 响应式容器 */
+    .container {
+        width: 100%;
+        padding-right: 15px;
+        padding-left: 15px;
+        margin-right: auto;
+        margin-left: auto;
+    }
+    
     /* 图片圆角样式 */
     img {
         border-radius: 12px;
+        max-width: 100%;
+        height: auto;
     }
     
     .feature-card {
@@ -46,8 +71,44 @@ st.markdown("""
     }
     .three-column-layout {
         display: grid;
-        grid-template-columns: 1fr 2fr 1fr;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
         gap: 1.5rem;
+    }
+    
+    /* 响应式布局 */
+    @media (max-width: 768px) {
+        .main {
+            padding: 0.5rem;
+        }
+        .feature-card,
+        .analysis-section,
+        .report-section {
+            padding: 1rem;
+        }
+        .chart-container {
+            height: 300px;
+        }
+        h1 {
+            font-size: 1.8rem;
+        }
+        h2 {
+            font-size: 1.5rem;
+        }
+        h3 {
+            font-size: 1.2rem;
+        }
+    }
+    
+    /* 弹性布局容器 */
+    .flex-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+    .flex-item {
+        flex: 1;
+        min-width: 250px;
     }
     .chart-container {
         height: 400px;

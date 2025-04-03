@@ -16,18 +16,43 @@ st.set_page_config(
 # 自定义CSS样式
 st.markdown("""
 <style>
+    /* 全局样式 */
+    .main {
+        padding: 1rem;
+        width: 100%;
+        max-width: 100%;
+        margin: 0 auto;
+        box-sizing: border-box;
+    }
+    body {
+        font-family: 'Helvetica Neue', sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+    }
+    
+    /* 响应式容器 */
+    .container {
+        width: 100%;
+        padding-right: 15px;
+        padding-left: 15px;
+        margin-right: auto;
+        margin-left: auto;
+    }
+    
     /* 图片圆角样式 */
     img {
         border-radius: 12px;
+        max-width: 100%;
+        height: auto;
     }
     
     .batch-upload-box {
         border: 2px dashed #0083B8;
-        padding: 2rem;
+        padding: 1.5rem;
         border-radius: 10px;
         text-align: center;
         background: rgba(0,131,184,0.05);
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
     }
     .result-card {
         background: white;
@@ -35,6 +60,11 @@ st.markdown("""
         border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         margin-bottom: 1rem;
+        transition: transform 0.2s;
+    }
+    .result-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     }
     .progress-container {
         background: #f0f2f6;
@@ -48,6 +78,42 @@ st.markdown("""
         padding: 1.5rem;
         border-radius: 8px;
         margin-bottom: 1rem;
+    }
+    
+    /* 响应式布局 */
+    @media (max-width: 768px) {
+        .main {
+            padding: 0.5rem;
+        }
+        .batch-upload-box {
+            padding: 1rem;
+        }
+        .result-card,
+        .progress-container,
+        .summary-box {
+            padding: 1rem;
+        }
+        h1 {
+            font-size: 1.8rem;
+        }
+        h2 {
+            font-size: 1.5rem;
+        }
+        h3 {
+            font-size: 1.2rem;
+        }
+    }
+    
+    /* 弹性布局容器 */
+    .flex-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+    .flex-item {
+        flex: 1;
+        min-width: 250px;
     }
 </style>
 """, unsafe_allow_html=True)

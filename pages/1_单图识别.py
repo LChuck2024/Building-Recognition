@@ -22,13 +22,35 @@ st.image(os.path.join(image_path,"single_header.svg"), use_column_width=True)
 # 自定义CSS样式
 st.markdown("""
 <style>
+    /* 全局样式 */
+    .main {
+        padding: 1rem;
+        width: 100%;
+        max-width: 100%;
+        margin: 0 auto;
+        box-sizing: border-box;
+    }
+    body {
+        font-family: 'Helvetica Neue', sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+    }
+    
+    /* 响应式容器 */
+    .container {
+        width: 100%;
+        padding-right: 15px;
+        padding-left: 15px;
+        margin-right: auto;
+        margin-left: auto;
+    }
+    
     /* 图片圆角样式 */
     img {
         border-radius: 12px;
+        max-width: 100%;
+        height: auto;
     }
-    /* 全局样式 */
-    .main {padding: 2rem; max-width: 1200px; margin: 0 auto;}
-    body {font-family: 'Helvetica Neue', sans-serif;}
     
     /* 按钮样式 */
     .stButton>button {
@@ -51,12 +73,13 @@ st.markdown("""
     /* 上传区域样式 */
     .upload-box {
         border: 2px dashed #ccc;
-        padding: 2.5rem;
+        padding: 1.5rem;
         text-align: center;
         border-radius: 12px;
         background: #ffffff;
         transition: all 0.3s ease;
         box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        margin: 1rem 0;
     }
     .upload-box:hover {
         border-color: #0083B8;
@@ -66,10 +89,11 @@ st.markdown("""
     /* 结果区域样式 */
     .result-box {
         background: linear-gradient(to bottom right, #ffffff, #f8f9fa);
-        padding: 2.5rem;
+        padding: 1.5rem;
         border-radius: 12px;
         box-shadow: 0 4px 16px rgba(0,0,0,0.08);
         transition: all 0.3s ease;
+        margin: 1rem 0;
     }
     .result-box:hover {
         transform: translateY(-2px);
@@ -94,10 +118,46 @@ st.markdown("""
     h1, h2, h3, h4 {
         color: #2C3E50;
         font-weight: 600;
+        margin-bottom: 1rem;
     }
     p {
         color: #34495E;
         line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+    
+    /* 响应式布局 */
+    @media (max-width: 768px) {
+        .main {
+            padding: 0.5rem;
+        }
+        .upload-box {
+            padding: 1rem;
+        }
+        .result-box {
+            padding: 1rem;
+        }
+        h1 {
+            font-size: 1.8rem;
+        }
+        h2 {
+            font-size: 1.5rem;
+        }
+        h3 {
+            font-size: 1.2rem;
+        }
+    }
+    
+    /* 弹性布局容器 */
+    .flex-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+    .flex-item {
+        flex: 1;
+        min-width: 250px;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -119,11 +179,11 @@ col1, col2, col3 = st.columns([1.5, 3, 3])
 
 with col1:
     st.markdown("### 📤 上传区域")
-    st.markdown("<div class='upload-box' style='min-height: 100px;'>", unsafe_allow_html=True)
+    # st.markdown("<div class='upload-box' style='min-height: 100px;'>", unsafe_allow_html=True)
     uploaded_file = st.file_uploader("选择一张包含建筑物的图片", type=['jpg', 'jpeg', 'png'], key="file_uploader")
     
     if uploaded_file is not None:
-        if st.button("🔍 开始识别", key="recognize_btn", use_container_width=True):
+        if st.button("🔍 开始识别", key="recognize_btn", type="primary"):
             with st.spinner('正在进行建筑物识别分析...'):
                 # 显示进度条
                 progress_bar = st.progress(0)
@@ -139,13 +199,12 @@ with col2:
     st.markdown("### 🖼️ 图片预览")
     if uploaded_file is not None:
         image = Image.open(uploaded_file)
-        st.image(image, caption='预览图片', use_container_width=True)
+        st.image(image, caption='预览图片', use_column_width=True)
 
 with col3:
     st.markdown("### 📊 识别结果")
     if uploaded_file is not None and st.session_state.get('processed', False):
-        st.markdown("<div class='result-box' style='min-height: 500px;'>", unsafe_allow_html=True)
-        
+        # st.markdown("<div class='result-box'>")
         # 示例结果（后续替换为实际模型输出）
         result = {
             "建筑物类型": "办公楼",
@@ -158,7 +217,7 @@ with col3:
         }
         
         # 显示主要结果
-        st.markdown(f"#### 🏢 识别类型")
+        st.markdown("#### 🏢 识别类型")
         st.markdown(f"<div style='background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;'>{result['建筑物类型']}</div>", unsafe_allow_html=True)
         
         # 显示置信度条
@@ -172,11 +231,9 @@ with col3:
         
         # 显示建筑特征
         st.markdown("#### 🏗️ 建筑特征")
-        # st.markdown(f"<div style='margin-bottom: 1.5rem;'>")
         st.markdown(f"**建筑年代：** {result['建筑年代']}")
         st.markdown(f"**楼层数：** {result['楼层数']}")
         st.markdown(f"**主要材料：** {result['主要材料']}")
-        st.markdown(f"</div>")
         
         # 显示详细信息
         st.markdown("#### 📝 详细描述")
@@ -185,7 +242,6 @@ with col3:
         # 显示建议用途
         st.markdown("#### 💡 建议用途")
         st.markdown(f"<div style='background: #f8f9fa; padding: 1rem; border-radius: 8px;'>{result['建议用途']}</div>", unsafe_allow_html=True)
-        
         st.markdown("</div>", unsafe_allow_html=True)
 
 # 添加页脚

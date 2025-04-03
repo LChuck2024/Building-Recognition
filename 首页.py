@@ -19,12 +19,33 @@ st.set_page_config(
 st.markdown("""
 <style>
     /* 全局样式 */
-    .main {padding: 2rem; max-width: 1200px; margin: 0 auto;}
-    body {font-family: 'Helvetica Neue', sans-serif;}
+    .main {
+        padding: 1rem;
+        width: 100%;
+        max-width: 100%;
+        margin: 0 auto;
+        box-sizing: border-box;
+    }
+    body {
+        font-family: 'Helvetica Neue', sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+    }
+    
+    /* 响应式容器 */
+    .container {
+        width: 100%;
+        padding-right: 15px;
+        padding-left: 15px;
+        margin-right: auto;
+        margin-left: auto;
+    }
     
     /* 图片圆角样式 */
     img {
         border-radius: 12px;
+        max-width: 100%;
+        height: auto;
     }
     
     /* 按钮样式 */
@@ -91,10 +112,46 @@ st.markdown("""
     h1, h2, h3, h4 {
         color: #2C3E50;
         font-weight: 600;
+        margin-bottom: 1rem;
     }
     p {
         color: #34495E;
         line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+    
+    /* 响应式布局 */
+    @media (max-width: 768px) {
+        .main {
+            padding: 0.5rem;
+        }
+        .upload-box {
+            padding: 1rem;
+        }
+        .result-box {
+            padding: 1rem;
+        }
+        h1 {
+            font-size: 1.8rem;
+        }
+        h2 {
+            font-size: 1.5rem;
+        }
+        h3 {
+            font-size: 1.2rem;
+        }
+    }
+    
+    /* 弹性布局容器 */
+    .flex-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+    .flex-item {
+        flex: 1;
+        min-width: 250px;
     }
 </style>
 """, unsafe_allow_html=True)

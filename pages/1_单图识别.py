@@ -10,7 +10,7 @@ from utils.yolo_detector import YOLODetector
 
 # 设置页面配置
 st.set_page_config(
-    page_title="单张图片识别 - 城市建筑物识别系统",
+    page_title="单张图片检测 - 城市建筑物检测系统",
     page_icon="🏢",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -167,75 +167,121 @@ st.markdown("""
 # 侧边栏设置
 with st.sidebar:
     st.markdown("### 检测设置")
+    # 初始化或恢复session_state中的设置
+    if 'confidence_threshold' not in st.session_state:
+        st.session_state.confidence_threshold = 0.5
+    if 'show_label' not in st.session_state:
+        st.session_state.show_label = True
     confidence_threshold = st.slider(
         "置信度阈值",
         min_value=0.0,
         max_value=1.0,
-        value=0.5,
-        help="调整检测的置信度阈值，值越高要求越严格"
+        value=st.session_state.get('confidence_threshold', 0.5),
+        help="调整检测的置信度阈值，值越高要求越严格",
+        on_change=lambda: setattr(st.session_state, 'confidence_threshold', confidence_threshold)
     )
     
     show_label = st.checkbox(
         "显示建筑物类型",
-        value=True,
-        help="在检测框上方显示建筑物类型标签"
+        value=st.session_state.get('show_label', True),
+        help="在检测框上方显示建筑物类型标签",
+        on_change=lambda: setattr(st.session_state, 'show_label', show_label)
     )
 
 # 主页面标题和介绍
-st.title("🏢 单张图片识别")
+st.title("🏢 单张图片检测")
 
-# 创建三列布局
-col1, col2, col3 = st.columns([1.5, 3, 3])
+# 上传区域单独一行
+st.markdown("### 📤 上传区域")
+# st.markdown("<div class='upload-box' style='min-height: 100px;'>", unsafe_allow_html=True)
+uploaded_file = st.file_uploader("选择一张包含建筑物的图片", type=['jpg', 'jpeg', 'png'])
+
+start_dect = st.button("🔍 开始检测", type="primary")
+
+# 创建两列布局用于图片预览和检测结果
+col1, col2 = st.columns([1, 1])
+
+if uploaded_file is not None:
+    # 检查是否是新上传的文件
+    if 'last_uploaded_file' not in st.session_state or st.session_state['last_uploaded_file'] != uploaded_file.name:
+        # 上传新图片时清空之前的检测结果
+        if 'processed' in st.session_state:
+            del st.session_state['processed']
+        if 'detections' in st.session_state:
+            del st.session_state['detections']
+        if 'viz_img' in st.session_state:
+            del st.session_state['viz_img']
+        # 记录当前上传的文件名
+        st.session_state['last_uploaded_file'] = uploaded_file.name
+        
+    if start_dect:
+        with st.spinner('正在进行建筑物检测分析...'):
+            # 初始化YOLO检测器
+            detector = YOLODetector()
+            
+            # 加载并处理图像
+            image = Image.open(uploaded_file)
+            if not isinstance(image, Image.Image):
+                st.error("无法加载图像文件，请确保上传的是有效的图像文件")
+                st.stop()
+            
+            # 执行检测
+            detections, viz_img = detector.detect(image, conf_thres=confidence_threshold)
+            
+            # 确保viz_img是RGB格式的numpy数组
+            if isinstance(viz_img, Image.Image):
+                viz_img = np.array(viz_img)
+            elif isinstance(viz_img, np.ndarray):
+                if len(viz_img.shape) == 3 and viz_img.shape[2] == 3:
+                    # YOLODetector返回BGR格式，需要转换为RGB
+                    viz_img = cv2.cvtColor(viz_img, cv2.COLOR_BGR2RGB)
+            
+            # 确保检测结果图像是正确的格式
+            if viz_img is None:
+                st.error("图像处理失败，请重试")
+                st.stop()
+            
+            st.success("✨ 检测完成！")
+            st.session_state['processed'] = True
+            st.session_state['detections'] = detections
+            st.session_state['viz_img'] = viz_img
+            
+            # 保存检测结果到数据库
+            from utils.db_manager import DBManager
+            db_manager = DBManager()
+            try:
+                # 只保存置信度高于阈值的检测结果
+                for detection in detections:
+                    if detection['confidence'] >= confidence_threshold:
+                        # 创建保存检测结果的目录
+                        results_dir = Path(__file__).parent.parent / 'data' / 'detection_results'
+                        results_dir.mkdir(parents=True, exist_ok=True)
+
+                        # 保存图片到结果目录
+                        result_img_path = results_dir / f"{int(time.time())}_{uploaded_file.name}"
+                        Image.fromarray(viz_img).save(result_img_path)
+
+                        db_manager.add_single_detection(
+                            image_path=str(result_img_path),
+                            building_type=detection['class'],
+                            confidence=detection['confidence'],
+                            feature_description=f"尺寸: {detection['width']}x{detection['height']}",
+                            detection_mode="单图检测",
+                            detection_result=detection
+                        )
+                st.success("检测结果已保存到历史记录")
+            except Exception as e:
+                st.error(f"保存检测结果失败: {str(e)}")
+
+st.markdown("</div>", unsafe_allow_html=True)
 
 with col1:
-    st.markdown("### 📤 上传区域")
-    # st.markdown("<div class='upload-box' style='min-height: 100px;'>", unsafe_allow_html=True)
-    uploaded_file = st.file_uploader("选择一张包含建筑物的图片", type=['jpg', 'jpeg', 'png'], key="file_uploader")
-    
-    if uploaded_file is not None:
-        if st.button("🔍 开始识别", key="recognize_btn", type="primary"):
-            with st.spinner('正在进行建筑物识别分析...'):
-                # 初始化YOLO检测器
-                detector = YOLODetector()
-                
-                # 加载并处理图像
-                image = Image.open(uploaded_file)
-                if not isinstance(image, Image.Image):
-                    st.error("无法加载图像文件，请确保上传的是有效的图像文件")
-                    st.stop()
-                
-                # 执行检测
-                detections = detector.detect(image, conf_thres=confidence_threshold)
-                
-                # 在图像上绘制检测结果
-                viz_img = detector.draw_detections(image, detections)
-                
-                # 确保viz_img是RGB格式的numpy数组
-                if isinstance(viz_img, Image.Image):
-                    viz_img = np.array(viz_img)
-                elif isinstance(viz_img, np.ndarray):
-                    if len(viz_img.shape) == 3 and viz_img.shape[2] == 3:
-                        # YOLODetector返回BGR格式，需要转换为RGB
-                        viz_img = cv2.cvtColor(viz_img, cv2.COLOR_BGR2RGB)
-                
-                # 确保检测结果图像是正确的格式
-                if viz_img is None:
-                    st.error("图像处理失败，请重试")
-                    st.stop()
-                
-                st.success("✨ 识别完成！")
-                st.session_state['processed'] = True
-                st.session_state['detections'] = detections
-                st.session_state['viz_img'] = viz_img
-    st.markdown("</div>", unsafe_allow_html=True)
-
-with col2:
     st.markdown("### 🖼️ 图片预览")
     if uploaded_file is not None:
         image = Image.open(uploaded_file)
         st.image(image, caption='预览图片', use_column_width=True)
 
-with col3:
+with col2:
     st.markdown("### 📊 检测结果")
     if uploaded_file is not None and st.session_state.get('processed', False):
         detections = st.session_state.get('detections', [])
@@ -280,6 +326,6 @@ with col3:
 st.markdown("---")
 st.markdown("""
 <div style='text-align: center; color: #666;'>
-    <p>© 2025 城市建筑物识别系统 | 技术支持：AIE52期-5组</p>
+    <p>© 2025 城市建筑物检测系统 | 技术支持：AIE52期-5组</p>
 </div>
 """, unsafe_allow_html=True)

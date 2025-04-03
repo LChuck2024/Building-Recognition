@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="200" viewBox="0 0 1200 200" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景渐变 -->
+    <defs>
+        <linearGradient id="headerGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#0083B8;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#00A3E0;stop-opacity:1" />
+        </linearGradient>
+    </defs>
+    
+    <!-- 背景矩形 -->
+    <rect width="1200" height="200" fill="url(#headerGradient)" rx="12" ry="12"/>
+    
+    <!-- 左侧建筑物图标组 -->
+    <g transform="translate(50,50)">
+        <!-- 建筑物1 -->
+        <path d="M20,100 L20,40 L60,40 L60,100 Z" fill="white" opacity="0.9"/>
+        <!-- 建筑物2 -->
+        <path d="M70,100 L70,20 L110,20 L110,100 Z" fill="white" opacity="0.8"/>
+        <!-- 变化箭头 -->
+        <path d="M130,60 L170,60 M160,50 L170,60 L160,70" stroke="white" stroke-width="3" fill="none"/>
+        <!-- 建筑物3 (新) -->
+        <path d="M190,100 L190,30 L230,10 L270,30 L270,100 Z" fill="white" opacity="0.9"/>
+    </g>
+    
+    <!-- 标题文本 -->
+    <text x="400" y="110" font-family="'Helvetica Neue', sans-serif" font-size="48" fill="white" font-weight="bold">城市建筑物变化检测</text>
+    
+    <!-- 装饰性元素 -->
+    <g transform="translate(900,50)">
+        <!-- 圆形装饰 -->
+        <circle cx="100" cy="50" r="30" fill="white" opacity="0.1"/>
+        <circle cx="150" cy="70" r="20" fill="white" opacity="0.15"/>
+        <circle cx="180" cy="40" r="15" fill="white" opacity="0.2"/>
+    </g>
+</svg>

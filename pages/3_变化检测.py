@@ -18,7 +18,7 @@ st.set_page_config(
 
 # 添加页眉图片
 image_path = os.path.join(Path(__file__).parent.parent,"images")
-st.image(os.path.join(image_path,"single_header.svg"), use_column_width=True)
+st.image(os.path.join(image_path,"change_header.svg"), use_column_width=True)
 
 # 自定义CSS样式
 st.markdown("""
@@ -259,51 +259,106 @@ if earlier_image is not None and recent_image is not None:
                 time.sleep(0.03)
                 progress_bar.progress(i + 1)
             
-            # 模拟处理图像并进行变化检测
-            # 这里应该是实际的图像处理和变化检测算法
+            # 加载和预处理图像
             earlier_img = Image.open(earlier_image)
             recent_img = Image.open(recent_image)
             
-            # 转换为numpy数组以便处理
+            # 确保两张图片大小一致
+            target_size = (800, 800)  # 设置统一的目标大小
+            earlier_img = earlier_img.resize(target_size)
+            recent_img = recent_img.resize(target_size)
+            
+            # 转换为numpy数组
             earlier_array = np.array(earlier_img)
             recent_array = np.array(recent_img)
             
-            # 模拟生成变化检测结果图像
-            # 在实际应用中，这里应该使用真实的变化检测算法
-            # 例如：基于深度学习的建筑物分割和变化检测
+            # 转换为灰度图像
+            earlier_gray = cv2.cvtColor(earlier_array, cv2.COLOR_RGB2GRAY)
+            recent_gray = cv2.cvtColor(recent_array, cv2.COLOR_RGB2GRAY)
             
-            # 创建一个模拟的变化掩码
-            change_mask = np.zeros(earlier_array.shape[:2], dtype=np.uint8)
-            # 随机生成一些变化区域（仅用于演示）
-            for _ in range(3):
-                x1, y1 = np.random.randint(0, change_mask.shape[1] - 100), np.random.randint(0, change_mask.shape[0] - 100)
-                x2, y2 = x1 + np.random.randint(50, 100), y1 + np.random.randint(50, 100)
-                change_mask[y1:y2, x1:x2] = 255
+            # 应用高斯模糊减少噪声
+            earlier_blur = cv2.GaussianBlur(earlier_gray, (5, 5), 0)
+            recent_blur = cv2.GaussianBlur(recent_gray, (5, 5), 0)
+            
+            # 计算差异图
+            diff = cv2.absdiff(earlier_blur, recent_blur)
+            
+            # 应用阈值处理
+            threshold = int(detection_threshold * 255)
+            _, change_mask = cv2.threshold(diff, threshold, 255, cv2.THRESH_BINARY)
+            
+            # 应用形态学操作来减少噪声和连接相近区域
+            kernel = np.ones((5,5), np.uint8)
+            change_mask = cv2.morphologyEx(change_mask, cv2.MORPH_CLOSE, kernel)
+            change_mask = cv2.morphologyEx(change_mask, cv2.MORPH_OPEN, kernel)
+            
+            # 查找变化区域的轮廓
+            contours, _ = cv2.findContours(change_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            
+            # 计算变化统计信息
+            total_change_area = 0
+            significant_changes = []
+            
+            for contour in contours:
+                area = cv2.contourArea(contour)
+                if area > 100:  # 过滤掉太小的变化区域
+                    x, y, w, h = cv2.boundingRect(contour)
+                    total_change_area += area
+                    
+                    # 分析变化类型
+                    earlier_region = earlier_gray[y:y+h, x:x+w]
+                    recent_region = recent_gray[y:y+h, x:x+w]
+                    intensity_diff = np.mean(recent_region) - np.mean(earlier_region)
+                    
+                    change_type = "扩建区域"
+                    if intensity_diff > 50:
+                        change_type = "新建筑物"
+                    elif intensity_diff < -50:
+                        change_type = "拆除建筑物"
+                    
+                    significant_changes.append({
+                        "类型": change_type,
+                        "位置": f"({x}, {y})",
+                        "面积": f"约 {int(area)} 平方像素",
+                        "置信度": f"{int((1 - abs(intensity_diff)/255) * 100)}%"
+                    })
             
             # 创建变化可视化图像
             if visualization_mode == "变化区域高亮":
-                # 高亮显示变化区域
                 change_viz = recent_array.copy()
-                change_viz[change_mask == 255] = [255, 0, 0]  # 红色高亮变化区域
+                for contour in contours:
+                    area = cv2.contourArea(contour)
+                    if area > 100:
+                        mask = np.zeros_like(recent_array, dtype=np.uint8)
+                        cv2.drawContours(mask, [contour], -1, (255, 255, 255), -1)
+                        change_viz[mask > 0] = [255, 0, 0]  # 红色高亮
+            
             elif visualization_mode == "变化区域轮廓":
-                # 显示变化区域轮廓
                 change_viz = recent_array.copy()
-                contours, _ = cv2.findContours(change_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-                cv2.drawContours(change_viz, contours, -1, (0, 255, 0), 2)
+                for contour in contours:
+                    area = cv2.contourArea(contour)
+                    if area > 100:
+                        cv2.drawContours(change_viz, [contour], -1, (0, 255, 0), 2)
+            
             else:  # 变化热力图
-                # 创建热力图
                 change_viz = recent_array.copy()
-                heatmap = cv2.applyColorMap(change_mask, cv2.COLORMAP_JET)
+                heatmap = np.zeros_like(change_mask, dtype=np.uint8)  # 确保数据类型为uint8
+                for contour in contours:
+                    area = cv2.contourArea(contour)
+                    if area > 100:
+                        cv2.drawContours(heatmap, [contour], -1, (255,), thickness=cv2.FILLED)  # 修改参数设置
+                heatmap = cv2.GaussianBlur(heatmap, (21, 21), 0)
+                heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
                 change_viz = cv2.addWeighted(change_viz, 0.7, heatmap, 0.3, 0)
             
-            # 模拟检测结果
+            # 统计检测结果
             changes_detected = {
-                "新建筑物": 2,
-                "拆除建筑物": 1,
-                "扩建区域": 3,
-                "高度变化": 1,
-                "总变化面积": "约 450 平方米",
-                "变化率": "12.5%"
+                "新建筑物": len([c for c in significant_changes if c["类型"] == "新建筑物"]),
+                "拆除建筑物": len([c for c in significant_changes if c["类型"] == "拆除建筑物"]),
+                "扩建区域": len([c for c in significant_changes if c["类型"] == "扩建区域"]),
+                "高度变化": 0,  # 需要额外的3D数据才能检测高度变化
+                "总变化面积": f"约 {int(total_change_area)} 平方像素",
+                "变化率": f"{(total_change_area / (target_size[0] * target_size[1]) * 100):.1f}%"
             }
             
             st.success("✨ 变化检测完成！")
@@ -342,16 +397,36 @@ if earlier_image is not None and recent_image is not None:
             # 显示详细变化列表
             st.markdown("#### 详细变化列表")
             
-            # 模拟变化详情数据
-            changes_data = [
-                {"类型": "新建筑物", "位置": "图像右上角", "面积": "约 120 平方米", "置信度": "92%"},
-                {"类型": "新建筑物", "位置": "图像中央", "面积": "约 85 平方米", "置信度": "88%"},
-                {"类型": "拆除建筑物", "位置": "图像左下角", "面积": "约 100 平方米", "置信度": "95%"},
-                {"类型": "扩建区域", "位置": "图像中央偏右", "面积": "约 45 平方米", "置信度": "87%"},
-                {"类型": "扩建区域", "位置": "图像左侧", "面积": "约 60 平方米", "置信度": "91%"},
-                {"类型": "扩建区域", "位置": "图像下方", "面积": "约 40 平方米", "置信度": "84%"},
-                {"类型": "高度变化", "位置": "图像中央建筑", "面积": "不适用", "置信度": "89%"}
-            ]
+            # 从实际检测结果生成变化详情数据
+            changes_data = []
+            try:
+                for contour in contours:
+                    area = cv2.contourArea(contour)
+                    if area > 100:  # 过滤小区域
+                        x, y, w, h = cv2.boundingRect(contour)
+                        earlier_region = earlier_gray[y:y+h, x:x+w]
+                        recent_region = recent_gray[y:y+h, x:x+w]
+                        intensity_diff = np.mean(recent_region) - np.mean(earlier_region)
+                        
+                        # 根据实际检测结果确定变化类型
+                        change_type = "扩建区域"
+                        if intensity_diff > 50:
+                            change_type = "新建筑物"
+                        elif intensity_diff < -50:
+                            change_type = "拆除建筑物"
+                        
+                        # 计算置信度
+                        confidence = int((1 - abs(intensity_diff)/255) * 100)
+                        
+                        changes_data.append({
+                            "类型": change_type,
+                            "位置": f"({x}, {y})",
+                            "面积": f"约 {int(area)} 平方像素",
+                            "置信度": f"{confidence}%"
+                        })
+            except Exception as e:
+                st.error(f"处理变化详情时发生错误: {str(e)}")
+                changes_data = []  # 发生错误时使用空列表
             
             # 创建DataFrame并显示
             changes_df = pd.DataFrame(changes_data)

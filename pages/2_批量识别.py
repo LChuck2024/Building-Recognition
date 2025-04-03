@@ -124,7 +124,7 @@ st.image(os.path.join(image_path,"batch_header.svg"), use_column_width=True)
 
 # 页面标题
 st.title("📑 批量建筑物识别")
-st.markdown("同时上传多张图片进行批量识别处理")
+st.markdown("同时上传多张图片进行批量识别检测")
 
 # 文件上传区域
 st.markdown("### 📤 上传图片")
@@ -154,18 +154,34 @@ if uploaded_files:
         for i, image_file in enumerate(row):
             with cols[i]:
                 # 显示图片,设置图片高度为200像素
-                st.image(image_file, caption=image_file.name,use_container_width=True)
+                st.image(image_file, caption=image_file.name,use_column_width=True)
                 # 添加文件名标签
                 # st.markdown(f"<p style='text-align: center; font-size: 0.8rem;'>{image_file.name}</p>", unsafe_allow_html=True)
 
-# 批量处理选项
-st.markdown("### ⚙️ 处理选项")
+# 批量检测选项
+st.markdown("### ⚙️ 检测选项")
 col1, col2 = st.columns(2)
 with col1:
+    # 初始化或恢复session_state中的设置
+    if 'process_mode' not in st.session_state:
+        st.session_state.process_mode = "标准模式"
+    if 'save_results' not in st.session_state:
+        st.session_state.save_results = True
+    if 'enable_segmentation' not in st.session_state:
+        st.session_state.enable_segmentation = True
+    if 'segmentation_method' not in st.session_state:
+        st.session_state.segmentation_method = "实例分割"
+    if 'visualization_mode' not in st.session_state:
+        st.session_state.visualization_mode = "掩码叠加"
+    if 'export_masks' not in st.session_state:
+        st.session_state.export_masks = True
+        
     process_mode = st.selectbox(
-        "处理模式",
+        "检测模式",
         options=["标准模式", "快速模式", "高精度模式", "无人机影像专用模式"],
-        help="选择不同的处理模式会影响识别的速度和准确度"
+        help="选择不同的检测模式会影响识别的速度和准确度",
+        index=["标准模式", "快速模式", "高精度模式", "无人机影像专用模式"].index(st.session_state.process_mode),
+        on_change=lambda: setattr(st.session_state, 'process_mode', process_mode)
     )
     
     if process_mode == "无人机影像专用模式":
@@ -174,8 +190,9 @@ with col1:
 with col2:
     save_results = st.checkbox(
         "保存识别结果",
-        value=True,
-        help="将识别结果保存到历史记录中"
+        value=st.session_state.save_results,
+        help="将识别结果保存到历史记录中",
+        on_change=lambda: setattr(st.session_state, 'save_results', save_results)
     )
 
 # 添加分割选项
@@ -185,16 +202,18 @@ seg_col1, seg_col2 = st.columns(2)
 with seg_col1:
     enable_segmentation = st.checkbox(
         "启用建筑物分割",
-        value=True,
-        help="对每张图片进行建筑物分割，生成分割掩码"
+        value=st.session_state.enable_segmentation,
+        help="对每张图片进行建筑物分割，生成分割掩码",
+        on_change=lambda: setattr(st.session_state, 'enable_segmentation', enable_segmentation)
     )
     
     if enable_segmentation:
         segmentation_method = st.selectbox(
             "分割方法",
             options=["语义分割", "实例分割", "全景分割"],
-            index=1,
-            help="不同的分割方法适用于不同场景"
+            index=["语义分割", "实例分割", "全景分割"].index(st.session_state.segmentation_method),
+            help="不同的分割方法适用于不同场景",
+            on_change=lambda: setattr(st.session_state, 'segmentation_method', segmentation_method)
         )
 
 with seg_col2:
@@ -202,73 +221,108 @@ with seg_col2:
         visualization_mode = st.selectbox(
             "可视化模式",
             options=["轮廓显示", "掩码叠加", "区域填充", "不显示"],
-            index=1,
-            help="选择分割结果的可视化方式"
+            index=["轮廓显示", "掩码叠加", "区域填充", "不显示"].index(st.session_state.visualization_mode),
+            help="选择分割结果的可视化方式",
+            on_change=lambda: setattr(st.session_state, 'visualization_mode', visualization_mode)
         )
         
         export_masks = st.checkbox(
             "导出分割掩码",
-            value=True,
-            help="将分割掩码作为单独的文件导出"
+            value=st.session_state.export_masks,
+            help="将分割掩码作为单独的文件导出",
+            on_change=lambda: setattr(st.session_state, 'export_masks', export_masks)
         )
 
-# 开始处理按钮
+# 开始检测按钮
 if uploaded_files:
-    if st.button("🚀 开始批量处理", type="primary"):
-        # 显示处理进度
-        st.markdown("### 📊 处理进度")
+    if st.button("🚀 开始批量检测", type="primary"):
+        # 显示检测进度
+        st.markdown("### 📊 检测进度")
         progress_container = st.empty()
         progress_bar = st.progress(0)
         status_text = st.empty()
         
-        # 模拟批量处理过程
+        # 初始化YOLO检测器
+        from utils.yolo_detector import YOLODetector
+        detector = YOLODetector()
+        
         total_files = len(uploaded_files)
         results = []
         
+        # 使用横向布局显示检测后的图片
+        st.markdown("### 🖼️ 检测结果预览[前5张]")
+        result_cols = st.columns(5)  # 创建5列布局
+
         for i, file in enumerate(uploaded_files):
+            start_time = time.time()
+            
             # 更新进度
             progress = (i + 1) / total_files
             progress_bar.progress(progress)
-            status_text.text(f"正在处理: {file.name} ({i+1}/{total_files})")
+            status_text.text(f"正在检测: {file.name} ({i+1}/{total_files})")
             
-            # 模拟处理延迟
-            time.sleep(0.5)
-            
-            # 模拟识别结果
-            results.append({
-                '文件名': file.name,
-                '建筑物类型': '办公楼',
-                '置信度': 95,
-                '处理时间': f"{0.5:.1f}秒"
-            })
+            try:
+                # 执行检测
+                detections, plotted_image = detector.detect(file)
+                
+                # 获取最高置信度的检测结果
+                if detections:
+                    best_detection = max(detections, key=lambda x: x['confidence'])
+                    confidence = round(best_detection['confidence'] * 100, 1)
+                    building_type = best_detection['label']
+                else:
+                    confidence = 0
+                    building_type = '未检测到建筑物'
+                
+                # 计算检测时间
+                process_time = time.time() - start_time
+                
+                # 保存结果
+                results.append({
+                    '文件名': file.name,
+                    '建筑物类型': building_type,
+                    '置信度': confidence,
+                    '检测时间': f"{process_time:.1f}秒"
+                })
+                
+                # 显示检测后的图片
+                if i < 5:  # 只显示前5张图片的检测结果
+                    with result_cols[i]:
+                        st.image(plotted_image, caption=f"检测结果: {file.name}", use_column_width=True)
+                    
+            except Exception as e:
+                st.error(f"检测文件 {file.name} 时出错: {str(e)}")
+                continue
         
-        # 显示处理完成信息
-        st.success(f"✨ 批量处理完成！共处理 {total_files} 张图片")
+        # 显示检测完成信息
+        st.success(f"✨ 批量检测完成！共检测 {total_files} 张图片")
         
-        # 显示处理结果摘要
-        st.markdown("### 📈 处理结果摘要")
+        # 显示检测结果摘要
+        st.markdown("### 📈 检测结果摘要")
         col1, col2, col3 = st.columns(3)
         with col1:
             st.markdown("""
             <div class='summary-box'>
-                <h3>总处理图片</h3>
+                <h3>总检测图片</h3>
                 <h2>{}</h2>
             </div>
             """.format(total_files), unsafe_allow_html=True)
         with col2:
+            avg_confidence = sum(result['置信度'] for result in results) / len(results) if results else 0
             st.markdown("""
             <div class='summary-box'>
                 <h3>平均置信度</h3>
-                <h2>95%</h2>
+                <h2>{:.1f}%</h2>
             </div>
-            """, unsafe_allow_html=True)
+            """.format(avg_confidence), unsafe_allow_html=True)
         with col3:
+            total_time = sum(float(result['检测时间'].replace('秒', '')) for result in results)
             st.markdown("""
             <div class='summary-box'>
                 <h3>总耗时</h3>
                 <h2>{:.1f}秒</h2>
             </div>
-            """.format(total_files * 0.5), unsafe_allow_html=True)
+            """.format(total_time), unsafe_allow_html=True)
         
         # 显示详细结果
         st.markdown("### 📋 详细结果")
@@ -286,7 +340,7 @@ if uploaded_files:
                 mime='text/csv'
             )
         with col2:
-            # 使用ExcelWriter对象处理Excel导出
+            # 使用ExcelWriter对象检测Excel导出
             with pd.ExcelWriter('batch_recognition_results.xlsx', engine='openpyxl') as writer:
                 results_df.to_excel(writer, index=False)
                 # ExcelWriter会自动保存，不需要显式调用save()
@@ -299,7 +353,7 @@ if uploaded_files:
                 mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             )
 else:
-    st.info("👆 请先上传需要处理的图片")
+    st.info("👆 请先上传需要检测的图片")
 
 # 添加页脚
 st.markdown("---")

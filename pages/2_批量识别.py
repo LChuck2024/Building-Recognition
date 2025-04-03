@@ -164,15 +164,53 @@ col1, col2 = st.columns(2)
 with col1:
     process_mode = st.selectbox(
         "处理模式",
-        options=["标准模式", "快速模式", "高精度模式"],
+        options=["标准模式", "快速模式", "高精度模式", "无人机影像专用模式"],
         help="选择不同的处理模式会影响识别的速度和准确度"
     )
+    
+    if process_mode == "无人机影像专用模式":
+        st.info("无人机影像专用模式针对低空影像特点进行了优化，可以更好地识别建筑物。")
+    
 with col2:
     save_results = st.checkbox(
         "保存识别结果",
         value=True,
         help="将识别结果保存到历史记录中"
     )
+
+# 添加分割选项
+st.markdown("#### 分割选项")
+seg_col1, seg_col2 = st.columns(2)
+
+with seg_col1:
+    enable_segmentation = st.checkbox(
+        "启用建筑物分割",
+        value=True,
+        help="对每张图片进行建筑物分割，生成分割掩码"
+    )
+    
+    if enable_segmentation:
+        segmentation_method = st.selectbox(
+            "分割方法",
+            options=["语义分割", "实例分割", "全景分割"],
+            index=1,
+            help="不同的分割方法适用于不同场景"
+        )
+
+with seg_col2:
+    if enable_segmentation:
+        visualization_mode = st.selectbox(
+            "可视化模式",
+            options=["轮廓显示", "掩码叠加", "区域填充", "不显示"],
+            index=1,
+            help="选择分割结果的可视化方式"
+        )
+        
+        export_masks = st.checkbox(
+            "导出分割掩码",
+            value=True,
+            help="将分割掩码作为单独的文件导出"
+        )
 
 # 开始处理按钮
 if uploaded_files:

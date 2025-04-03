@@ -161,12 +161,12 @@ current_dir = Path(__file__).parent
 st.image(f"{current_dir}/images/home_header.svg")
 
 # 侧边栏设置
-with st.sidebar:
-    st.title("系统信息")
-    st.markdown("### 支持的建筑物类型")
-    building_types = ["住宅楼", "办公楼", "商业建筑", "工业建筑", "文教建筑", "医疗建筑", "酒店建筑"]
-    for bt in building_types:
-        st.markdown(f"- {bt}")
+# with st.sidebar:
+#     st.title("系统信息")
+#     st.markdown("### 支持的建筑物类型")
+#     building_types = ["住宅楼", "办公楼", "商业建筑", "工业建筑", "文教建筑", "医疗建筑", "酒店建筑"]
+#     for bt in building_types:
+#         st.markdown(f"- {bt}")
 
 # 主页面标题和介绍
 # 主页面标题和介绍

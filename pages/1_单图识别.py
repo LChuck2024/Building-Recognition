@@ -6,6 +6,7 @@ import cv2
 from pathlib import Path
 import time
 import os
+from utils.yolo_detector import YOLODetector
 
 # 设置页面配置
 st.set_page_config(
@@ -165,11 +166,20 @@ st.markdown("""
 
 # 侧边栏设置
 with st.sidebar:
-    st.title("系统信息")
-    st.markdown("### 支持的建筑物类型")
-    building_types = ["住宅楼", "办公楼", "商业建筑", "工业建筑", "文教建筑", "医疗建筑", "酒店建筑"]
-    for bt in building_types:
-        st.markdown(f"- {bt}")
+    st.markdown("### 检测设置")
+    confidence_threshold = st.slider(
+        "置信度阈值",
+        min_value=0.0,
+        max_value=1.0,
+        value=0.5,
+        help="调整检测的置信度阈值，值越高要求越严格"
+    )
+    
+    show_label = st.checkbox(
+        "显示建筑物类型",
+        value=True,
+        help="在检测框上方显示建筑物类型标签"
+    )
 
 # 主页面标题和介绍
 st.title("🏢 单张图片识别")
@@ -185,14 +195,38 @@ with col1:
     if uploaded_file is not None:
         if st.button("🔍 开始识别", key="recognize_btn", type="primary"):
             with st.spinner('正在进行建筑物识别分析...'):
-                # 显示进度条
-                progress_bar = st.progress(0)
-                for i in range(100):
-                    time.sleep(0.02)
-                    progress_bar.progress(i + 1)
+                # 初始化YOLO检测器
+                detector = YOLODetector()
+                
+                # 加载并处理图像
+                image = Image.open(uploaded_file)
+                if not isinstance(image, Image.Image):
+                    st.error("无法加载图像文件，请确保上传的是有效的图像文件")
+                    st.stop()
+                
+                # 执行检测
+                detections = detector.detect(image, conf_thres=confidence_threshold)
+                
+                # 在图像上绘制检测结果
+                viz_img = detector.draw_detections(image, detections, show_label=show_label)
+                
+                # 确保viz_img是RGB格式的numpy数组
+                if isinstance(viz_img, Image.Image):
+                    viz_img = np.array(viz_img)
+                elif isinstance(viz_img, np.ndarray):
+                    if len(viz_img.shape) == 3 and viz_img.shape[2] == 3:
+                        # YOLODetector返回BGR格式，需要转换为RGB
+                        viz_img = cv2.cvtColor(viz_img, cv2.COLOR_BGR2RGB)
+                
+                # 确保检测结果图像是正确的格式
+                if viz_img is None:
+                    st.error("图像处理失败，请重试")
+                    st.stop()
                 
                 st.success("✨ 识别完成！")
                 st.session_state['processed'] = True
+                st.session_state['detections'] = detections
+                st.session_state['viz_img'] = viz_img
     st.markdown("</div>", unsafe_allow_html=True)
 
 with col2:
@@ -202,46 +236,44 @@ with col2:
         st.image(image, caption='预览图片', use_column_width=True)
 
 with col3:
-    st.markdown("### 📊 识别结果")
+    st.markdown("### 📊 检测结果")
     if uploaded_file is not None and st.session_state.get('processed', False):
-        # st.markdown("<div class='result-box'>")
-        # 示例结果（后续替换为实际模型输出）
-        result = {
-            "建筑物类型": "办公楼",
-            "置信度": 95,
-            "特征描述": "现代化商务建筑，玻璃幕墙设计",
-            "建议用途": "适合作为企业总部或商务中心",
-            "建筑年代": "2010-2015年",
-            "楼层数": "25层",
-            "主要材料": "钢结构+玻璃幕墙"
-        }
+        detections = st.session_state.get('detections', [])
+        viz_img = st.session_state.get('viz_img')
         
-        # 显示主要结果
-        st.markdown("#### 🏢 识别类型")
-        st.markdown(f"<div style='background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;'>{result['建筑物类型']}</div>", unsafe_allow_html=True)
+        # 显示检测结果图像
+        # 检查viz_img是否为None或空数组
+        if viz_img is not None and viz_img.size > 0:
+            try:
+                st.image(viz_img, caption="建筑物检测结果", use_column_width=True)
+            except Exception as e:
+                st.error(f"显示检测结果图像时出错: {str(e)}")
+        else:
+            st.warning("未能生成检测结果图像")
         
-        # 显示置信度条
-        st.markdown("#### 📈 置信度")
-        st.markdown(f"""
-        <div class='confidence-meter' style='margin-bottom: 1.5rem;'>
-            <div class='confidence-bar' style='width: {result['置信度']}%;'></div>
-        </div>
-        <p style='text-align: right; margin-bottom: 1.5rem;'>{result['置信度']}%</p>
-        """, unsafe_allow_html=True)
+        # 显示检测统计信息
+        st.markdown("#### 📊 检测统计")
+        valid_detections = [d for d in detections if d['confidence'] >= confidence_threshold]
         
-        # 显示建筑特征
-        st.markdown("#### 🏗️ 建筑特征")
-        st.markdown(f"**建筑年代：** {result['建筑年代']}")
-        st.markdown(f"**楼层数：** {result['楼层数']}")
-        st.markdown(f"**主要材料：** {result['主要材料']}")
+        stats_col1, stats_col2 = st.columns(2)
+        with stats_col1:
+            st.metric("检测到的建筑物数量", len(valid_detections))
+        with stats_col2:
+            if valid_detections:
+                avg_conf = sum(d['confidence'] for d in valid_detections) / len(valid_detections)
+                st.metric("平均置信度", f"{avg_conf:.2%}")
+            else:
+                st.metric("平均置信度", "0%")
         
-        # 显示详细信息
-        st.markdown("#### 📝 详细描述")
-        st.markdown(f"<div style='background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;'>{result['特征描述']}</div>", unsafe_allow_html=True)
+        # 提供导出选项
+        st.markdown("#### 💾 导出选项")
+        st.download_button(
+            label="📥 导出检测结果图像",
+            data=cv2.imencode('.png', viz_img if viz_img is not None else np.zeros((100,100,3), dtype=np.uint8))[1].tobytes(),
+            file_name="detection_result.png",
+            mime="image/png"
+        )
         
-        # 显示建议用途
-        st.markdown("#### 💡 建议用途")
-        st.markdown(f"<div style='background: #f8f9fa; padding: 1rem; border-radius: 8px;'>{result['建议用途']}</div>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
 # 添加页脚

@@ -21,7 +21,7 @@ st.set_page_config(
 
 # 添加页眉图片
 image_path = os.path.join(Path(__file__).parent.parent,"images")
-st.image(os.path.join(image_path,"change_header.svg"), use_column_width=True)
+st.image(os.path.join(image_path,"change_header.svg"), use_container_width=True)
 
 # 自定义CSS样式
 st.markdown("""
@@ -231,14 +231,14 @@ with col1:
     earlier_image = st.file_uploader("选择早期影像", type=['jpg', 'jpeg', 'png'], key="earlier_image")
     
     if earlier_image is not None:
-        st.image(earlier_image, caption="早期影像预览", use_column_width=True)
+        st.image(earlier_image, caption="早期影像预览", use_container_width=True)
 
 with col2:
     st.markdown("### 📤 近期影像上传")
     recent_image = st.file_uploader("选择近期影像", type=['jpg', 'jpeg', 'png'], key="recent_image")
     
     if recent_image is not None:
-        st.image(recent_image, caption="近期影像预览", use_column_width=True)
+        st.image(recent_image, caption="近期影像预览", use_container_width=True)
 
 # 检测选项
 st.markdown("### ⚙️ 检测选项")
@@ -389,13 +389,13 @@ if earlier_image is not None and recent_image is not None:
             viz_col1, viz_col2, viz_col3 = st.columns([1, 1, 1])
             
             with viz_col1:
-                st.image(earlier_img, caption="早期影像", use_column_width=True)
+                st.image(earlier_img, caption="早期影像", use_container_width=True)
             
             with viz_col2:
-                st.image(recent_img, caption="近期影像", use_column_width=True)
+                st.image(recent_img, caption="近期影像", use_container_width=True)
             
             with viz_col3:
-                st.image(Image.fromarray(change_viz), caption="变化检测结果", use_column_width=True)
+                st.image(Image.fromarray(change_viz), caption="变化检测结果", use_container_width=True)
             
             # 显示详细变化列表
             st.markdown("#### 详细变化列表")

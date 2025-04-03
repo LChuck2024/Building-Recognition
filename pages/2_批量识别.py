@@ -120,7 +120,7 @@ st.markdown("""
 
 # 添加页眉图片
 image_path = os.path.join(Path(__file__).parent.parent,"images")
-st.image(os.path.join(image_path,"batch_header.svg"), use_column_width=True)
+st.image(os.path.join(image_path,"batch_header.svg"), use_container_width=True)
 
 # 页面标题
 st.title("📑 批量建筑物识别")
@@ -154,7 +154,7 @@ if uploaded_files:
         for i, image_file in enumerate(row):
             with cols[i]:
                 # 显示图片,设置图片高度为200像素
-                st.image(image_file, caption=image_file.name,use_column_width=True)
+                st.image(image_file, caption=image_file.name,use_container_width=True)
                 # 添加文件名标签
                 # st.markdown(f"<p style='text-align: center; font-size: 0.8rem;'>{image_file.name}</p>", unsafe_allow_html=True)
 
@@ -288,7 +288,7 @@ if uploaded_files:
                 # 显示检测后的图片
                 if i < 5:  # 只显示前5张图片的检测结果
                     with result_cols[i]:
-                        st.image(plotted_image, caption=f"检测结果: {file.name}", use_column_width=True)
+                        st.image(plotted_image, caption=f"检测结果: {file.name}", use_container_width=True)
                     
             except Exception as e:
                 st.error(f"检测文件 {file.name} 时出错: {str(e)}")

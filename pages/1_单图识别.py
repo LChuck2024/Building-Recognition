@@ -21,7 +21,7 @@ st.set_page_config(
 
 # 添加页眉图片
 image_path = os.path.join(Path(__file__).parent.parent,"images")
-st.image(os.path.join(image_path,"single_header.svg"), use_column_width=True)
+st.image(os.path.join(image_path,"single_header.svg"), use_container_width=True)
 
 # 自定义CSS样式
 st.markdown("""
@@ -282,7 +282,7 @@ with col1:
     st.markdown("### 🖼️ 图片预览")
     if uploaded_file is not None:
         image = Image.open(uploaded_file)
-        st.image(image, caption='预览图片', use_column_width=True)
+        st.image(image, caption='预览图片', use_container_width=True)
 
 with col2:
     st.markdown("### 📊 检测结果")
@@ -294,7 +294,7 @@ with col2:
         # 检查viz_img是否为None或空数组
         if viz_img is not None and viz_img.size > 0:
             try:
-                st.image(viz_img, caption="建筑物检测结果", use_column_width=True)
+                st.image(viz_img, caption="建筑物检测结果", use_container_width=True)
             except Exception as e:
                 st.error(f"显示检测结果图像时出错: {str(e)}")
         else:

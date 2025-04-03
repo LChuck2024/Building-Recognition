@@ -198,7 +198,7 @@ else:
             if record_type == "单图识别":
                 try:
                     if Path(record['image_path']).exists():
-                        st.image(record['image_path'], caption="识别图片", use_column_width=True)
+                        st.image(record['image_path'], caption="识别图片", use_container_width=True)
                     else:
                         st.warning(f"图片文件不存在: {record['image_path']}")
                 except Exception as e:

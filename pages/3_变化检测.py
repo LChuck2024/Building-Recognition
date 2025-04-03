@@ -2,11 +2,14 @@ import streamlit as st
 # import torch
 from PIL import Image
 import numpy as np
-import cv2
 from pathlib import Path
 import time
 import os
 import pandas as pd
+import cv2
+cv2.setUseOptimized(True)
+cv2.setNumThreads(4)
+
 
 # 设置页面配置
 st.set_page_config(

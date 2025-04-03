@@ -3,6 +3,9 @@ import streamlit as st
 from PIL import Image
 import numpy as np
 import cv2
+cv2.setUseOptimized(True)
+cv2.setNumThreads(4)
+
 from pathlib import Path
 import time
 import os

@@ -9,7 +9,7 @@ cv2.setNumThreads(4)
 from pathlib import Path
 import time
 import os
-from utils.yolo_detector import YOLODetector
+from utils.model_detector import ModelDetector
 
 # 设置页面配置
 st.set_page_config(
@@ -175,6 +175,22 @@ with st.sidebar:
         st.session_state.confidence_threshold = 0.5
     if 'show_label' not in st.session_state:
         st.session_state.show_label = True
+    if 'model_name' not in st.session_state:
+        st.session_state.model_name = 'yolo11n.pt'
+
+    model_name = st.selectbox(
+        "选择模型",
+        options=['yolo11n.pt', 'UNet_model_fold4.pth', 'fcn_resnet50_model_best.pth'],
+        help="选择不同的预训练模型进行检测",
+        on_change=lambda: setattr(st.session_state, 'model_name', model_name)
+    )
+    
+    if 'model_name' not in st.session_state:
+        st.session_state.model_name = 'yolo11n.pt'
+    
+    print(f'页面选择模型：{model_name}')
+
+    
     confidence_threshold = st.slider(
         "置信度阈值",
         min_value=0.0,
@@ -182,13 +198,6 @@ with st.sidebar:
         value=st.session_state.get('confidence_threshold', 0.5),
         help="调整检测的置信度阈值，值越高要求越严格",
         on_change=lambda: setattr(st.session_state, 'confidence_threshold', confidence_threshold)
-    )
-    
-    show_label = st.checkbox(
-        "显示建筑物类型",
-        value=st.session_state.get('show_label', True),
-        help="在检测框上方显示建筑物类型标签",
-        on_change=lambda: setattr(st.session_state, 'show_label', show_label)
     )
 
 # 主页面标题和介绍
@@ -220,7 +229,7 @@ if uploaded_file is not None:
     if start_dect:
         with st.spinner('正在进行建筑物检测分析...'):
             # 初始化YOLO检测器
-            detector = YOLODetector()
+            detector = ModelDetector(model_name=st.session_state.model_name)
             
             # 加载并处理图像
             image = Image.open(uploaded_file)

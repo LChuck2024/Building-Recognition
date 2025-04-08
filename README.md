@@ -73,7 +73,7 @@ Building-Recognition/
 ├── utils/              # 工具函数
 │   ├── __init__.py
 │   ├── db_manager.py   # 数据库管理工具
-│   └── yolo_detector.py # YOLO检测工具
+│   └── model_detector.py # YOLO检测工具
 ├── images/             # 界面资源
 │   ├── batch_header.svg
 │   ├── change_header.svg
@@ -81,6 +81,10 @@ Building-Recognition/
 │   └── single_header.svg
 ├── data/               # 数据文件
 │   └── history.db
+├── model/               # 数据文件
+│   ├── fcn_resnet50_model_best.pth # FCN模型文件
+│   ├── UNet_model_fold4.pth # Unet模型文件
+│   └── yolo11n.pt      # YOLO模型文件
 ├── yolo11n.pt          # YOLO模型文件
 └── requirements.txt    # 项目依赖
 ```

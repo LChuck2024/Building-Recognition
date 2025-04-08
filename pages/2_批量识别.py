@@ -5,6 +5,8 @@ import time
 # from io import BytesIO
 import os
 from pathlib import Path
+# 初始化YOLO检测器
+from utils.model_detector import ModelDetector
 
 # 设置页面配置
 st.set_page_config(
@@ -241,10 +243,8 @@ if uploaded_files:
         progress_container = st.empty()
         progress_bar = st.progress(0)
         status_text = st.empty()
-        
-        # 初始化YOLO检测器
-        from utils.yolo_detector import YOLODetector
-        detector = YOLODetector()
+
+        detector = ModelDetector()
         
         total_files = len(uploaded_files)
         results = []

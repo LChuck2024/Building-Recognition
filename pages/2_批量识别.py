@@ -156,14 +156,14 @@ with st.sidebar:
     print(f'页面选择模型：{model_name}')
 
     
-    confidence_threshold = st.slider(
-        "置信度阈值",
-        min_value=0.0,
-        max_value=1.0,
-        value=st.session_state.get('confidence_threshold', 0.5),
-        help="调整检测的置信度阈值，值越高要求越严格",
-        on_change=lambda: setattr(st.session_state, 'confidence_threshold', confidence_threshold)
-    )
+    # confidence_threshold = st.slider(
+    #     "置信度阈值",
+    #     min_value=0.0,
+    #     max_value=1.0,
+    #     value=st.session_state.get('confidence_threshold', 0.5),
+    #     help="调整检测的置信度阈值，值越高要求越严格",
+    #     on_change=lambda: setattr(st.session_state, 'confidence_threshold', confidence_threshold)
+    # )
 
 
 # 文件上传区域

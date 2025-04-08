@@ -199,13 +199,6 @@ with st.sidebar:
         help="调整检测的置信度阈值，值越高要求越严格",
         on_change=lambda: setattr(st.session_state, 'confidence_threshold', confidence_threshold)
     )
-    
-    show_label = st.checkbox(
-        "显示建筑物类型",
-        value=st.session_state.get('show_label', True),
-        help="在检测框上方显示建筑物类型标签",
-        on_change=lambda: setattr(st.session_state, 'show_label', show_label)
-    )
 
 # 主页面标题和介绍
 st.title("🏢 单张图片检测")

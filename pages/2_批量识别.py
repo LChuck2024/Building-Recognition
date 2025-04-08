@@ -128,6 +128,44 @@ st.image(os.path.join(image_path,"batch_header.svg"), use_container_width=True)
 st.title("📑 批量建筑物识别")
 st.markdown("同时上传多张图片进行批量识别检测")
 
+# 初始化或恢复session_state中的设置
+if 'process_mode' not in st.session_state:
+    st.session_state.process_mode = "标准模式"
+
+# 侧边栏设置
+with st.sidebar:
+    st.markdown("### 检测设置")
+    # 初始化或恢复session_state中的设置
+    if 'confidence_threshold' not in st.session_state:
+        st.session_state.confidence_threshold = 0.5
+    if 'show_label' not in st.session_state:
+        st.session_state.show_label = True
+    if 'model_name' not in st.session_state:
+        st.session_state.model_name = 'yolo11n.pt'
+
+    model_name = st.selectbox(
+        "选择模型",
+        options=['yolo11n.pt', 'UNet_model_fold4.pth', 'fcn_resnet50_model_best.pth'],
+        help="选择不同的预训练模型进行检测",
+        on_change=lambda: setattr(st.session_state, 'model_name', model_name)
+    )
+    
+    if 'model_name' not in st.session_state:
+        st.session_state.model_name = 'yolo11n.pt'
+    
+    print(f'页面选择模型：{model_name}')
+
+    
+    confidence_threshold = st.slider(
+        "置信度阈值",
+        min_value=0.0,
+        max_value=1.0,
+        value=st.session_state.get('confidence_threshold', 0.5),
+        help="调整检测的置信度阈值，值越高要求越严格",
+        on_change=lambda: setattr(st.session_state, 'confidence_threshold', confidence_threshold)
+    )
+
+
 # 文件上传区域
 st.markdown("### 📤 上传图片")
 
@@ -136,13 +174,6 @@ uploaded_files = st.file_uploader(
     type=['jpg', 'jpeg', 'png'],
     accept_multiple_files=True
 )
-# 显示批量上传区域
-# st.markdown("""
-# <div class='batch-upload-box'>
-#     <h4>拖拽或选择多张建筑物图片</h4>
-#     <p>支持 .jpg、.jpeg、.png 格式</p>
-# </div>
-# """, unsafe_allow_html=True)
 
 # 显示上传的图片预览
 if uploaded_files:
@@ -160,81 +191,6 @@ if uploaded_files:
                 # 添加文件名标签
                 # st.markdown(f"<p style='text-align: center; font-size: 0.8rem;'>{image_file.name}</p>", unsafe_allow_html=True)
 
-# 批量检测选项
-st.markdown("### ⚙️ 检测选项")
-col1, col2 = st.columns(2)
-with col1:
-    # 初始化或恢复session_state中的设置
-    if 'process_mode' not in st.session_state:
-        st.session_state.process_mode = "标准模式"
-    if 'save_results' not in st.session_state:
-        st.session_state.save_results = True
-    if 'enable_segmentation' not in st.session_state:
-        st.session_state.enable_segmentation = True
-    if 'segmentation_method' not in st.session_state:
-        st.session_state.segmentation_method = "实例分割"
-    if 'visualization_mode' not in st.session_state:
-        st.session_state.visualization_mode = "掩码叠加"
-    if 'export_masks' not in st.session_state:
-        st.session_state.export_masks = True
-        
-    process_mode = st.selectbox(
-        "检测模式",
-        options=["标准模式", "快速模式", "高精度模式", "无人机影像专用模式"],
-        help="选择不同的检测模式会影响识别的速度和准确度",
-        index=["标准模式", "快速模式", "高精度模式", "无人机影像专用模式"].index(st.session_state.process_mode),
-        on_change=lambda: setattr(st.session_state, 'process_mode', process_mode)
-    )
-    
-    if process_mode == "无人机影像专用模式":
-        st.info("无人机影像专用模式针对低空影像特点进行了优化，可以更好地识别建筑物。")
-    
-with col2:
-    save_results = st.checkbox(
-        "保存识别结果",
-        value=st.session_state.save_results,
-        help="将识别结果保存到历史记录中",
-        on_change=lambda: setattr(st.session_state, 'save_results', save_results)
-    )
-
-# 添加分割选项
-st.markdown("#### 分割选项")
-seg_col1, seg_col2 = st.columns(2)
-
-with seg_col1:
-    enable_segmentation = st.checkbox(
-        "启用建筑物分割",
-        value=st.session_state.enable_segmentation,
-        help="对每张图片进行建筑物分割，生成分割掩码",
-        on_change=lambda: setattr(st.session_state, 'enable_segmentation', enable_segmentation)
-    )
-    
-    if enable_segmentation:
-        segmentation_method = st.selectbox(
-            "分割方法",
-            options=["语义分割", "实例分割", "全景分割"],
-            index=["语义分割", "实例分割", "全景分割"].index(st.session_state.segmentation_method),
-            help="不同的分割方法适用于不同场景",
-            on_change=lambda: setattr(st.session_state, 'segmentation_method', segmentation_method)
-        )
-
-with seg_col2:
-    if enable_segmentation:
-        visualization_mode = st.selectbox(
-            "可视化模式",
-            options=["轮廓显示", "掩码叠加", "区域填充", "不显示"],
-            index=["轮廓显示", "掩码叠加", "区域填充", "不显示"].index(st.session_state.visualization_mode),
-            help="选择分割结果的可视化方式",
-            on_change=lambda: setattr(st.session_state, 'visualization_mode', visualization_mode)
-        )
-        
-        export_masks = st.checkbox(
-            "导出分割掩码",
-            value=st.session_state.export_masks,
-            help="将分割掩码作为单独的文件导出",
-            on_change=lambda: setattr(st.session_state, 'export_masks', export_masks)
-        )
-
 # 开始检测按钮
 if uploaded_files:
     if st.button("🚀 开始批量检测", type="primary"):
@@ -244,7 +200,7 @@ if uploaded_files:
         progress_bar = st.progress(0)
         status_text = st.empty()
 
-        detector = ModelDetector()
+        detector = ModelDetector(model_name=st.session_state.model_name)
         
         total_files = len(uploaded_files)
         results = []

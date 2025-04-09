@@ -11,7 +11,7 @@ from sqlite3 import Error as SQLiteError
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
-    filename='db_operations.log'
+    filename=str(Path(__file__).parent.parent / 'data' / 'db_operations.log')
 )
 logger = logging.getLogger(__name__)
 

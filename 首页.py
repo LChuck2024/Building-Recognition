@@ -1,10 +1,5 @@
 import streamlit as st
-# import torch
-# from PIL import Image
-import numpy as np
-# import cv2
 from pathlib import Path
-# import time
 
 # 设置页面主题和样式
 st.set_page_config(
@@ -13,7 +8,6 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
-
 
 # 自定义CSS样式
 st.markdown("""
@@ -32,80 +26,39 @@ st.markdown("""
         line-height: 1.5;
     }
     
-    /* 响应式容器 */
-    .container {
-        width: 100%;
-        padding-right: 15px;
-        padding-left: 15px;
-        margin-right: auto;
-        margin-left: auto;
+    /* 卡片样式 */
+    .card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+    }
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
     
-    /* 图片圆角样式 */
+    /* 特性卡片 */
+    .feature-card {
+        background: white;
+        padding: 1.2rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        margin: 0.5rem;
+        transition: all 0.3s ease;
+    }
+    .feature-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    /* 图片样式 */
     img {
         border-radius: 12px;
         max-width: 100%;
         height: auto;
-    }
-    
-    /* 按钮样式 */
-    .stButton>button {
-        width: 100%;
-        background: linear-gradient(45deg, #0083B8, #00A3E0);
-        color: white;
-        border: none;
-        padding: 0.8rem;
-        border-radius: 8px;
-        font-weight: 500;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        transition: all 0.3s ease;
-    }
-    .stButton>button:hover {
-        background: linear-gradient(45deg, #00669E, #0083B8);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    }
-    
-    /* 上传区域样式 */
-    .upload-box {
-        border: 2px dashed #ccc;
-        padding: 2.5rem;
-        text-align: center;
-        border-radius: 12px;
-        background: #ffffff;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-    .upload-box:hover {
-        border-color: #0083B8;
-        box-shadow: 0 4px 12px rgba(0,131,184,0.1);
-    }
-    
-    /* 结果区域样式 */
-    .result-box {
-        background: linear-gradient(to bottom right, #ffffff, #f8f9fa);
-        padding: 2.5rem;
-        border-radius: 12px;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-        transition: all 0.3s ease;
-    }
-    .result-box:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(0,0,0,0.12);
-    }
-    
-    /* 置信度条样式 */
-    .confidence-meter {
-        height: 24px;
-        background-color: #e9ecef;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
-    }
-    .confidence-bar {
-        height: 100%;
-        background: linear-gradient(90deg, #0083B8, #00A3E0);
-        transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
     /* 标题和文本样式 */
@@ -125,105 +78,144 @@ st.markdown("""
         .main {
             padding: 0.5rem;
         }
-        .upload-box {
-            padding: 1rem;
-        }
-        .result-box {
+        .card {
             padding: 1rem;
         }
         h1 {
             font-size: 1.8rem;
         }
-        h2 {
-            font-size: 1.5rem;
-        }
-        h3 {
-            font-size: 1.2rem;
-        }
-    }
-    
-    /* 弹性布局容器 */
-    .flex-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
-        margin: 1rem 0;
-    }
-    .flex-item {
-        flex: 1;
-        min-width: 250px;
     }
 </style>
 """, unsafe_allow_html=True)
-# 使用相对路径导入图片
+
 # 获取当前文件路径
 current_dir = Path(__file__).parent
-st.image(f"{current_dir}/images/home_header.svg",use_container_width=True)
 
-# 侧边栏设置
-# with st.sidebar:
-#     st.title("系统信息")
-#     st.markdown("### 支持的建筑物类型")
-#     building_types = ["住宅楼", "办公楼", "商业建筑", "工业建筑", "文教建筑", "医疗建筑", "酒店建筑"]
-#     for bt in building_types:
-#         st.markdown(f"- {bt}")
+# 页面头部
+st.image(f"{current_dir}/images/home_header.svg", use_container_width=True)
+st.title("🏢 智能建筑物识别系统")
 
-# 主页面标题和介绍
-# 主页面标题和介绍
-st.title("🏢 城市建筑物识别系统")
+# 欢迎区域
+st.markdown("""
+<div style='background: linear-gradient(to right, #0083B8, #00A3E0); color: white; padding: 2rem; border-radius: 12px; margin-bottom: 2rem;'>
+    <h2 style='color: white; margin-bottom: 1rem;'>👋 欢迎使用智能建筑物识别系统</h2>
+    <p style='color: white; font-size: 1.1rem;'>本系统采用先进的深度学习技术，为您提供精准的建筑物识别和分类服务。无论是单张图片识别还是批量处理，我们都能为您提供专业的解决方案。</p>
+</div>
+""", unsafe_allow_html=True)
 
-# 创建两列布局
-col1, col2 = st.columns([1, 1])
+# 项目背景与价值
+st.markdown("### 🌟 项目背景与价值")
+st.markdown("""
+<div class='card'>
+    <h3>项目背景</h3>
+    <p>随着城市化的快速发展，建筑物识别技术在城市规划、建筑监测和房地产评估等领域发挥着越来越重要的作用。传统的人工识别方法效率低下、成本高昂，难以满足现代城市管理的需求。</p>
+    <h3>实际应用价值</h3>
+    <ul>
+        <li>🏙️ 城市规划：快速获取城市建筑分布信息，为城市规划决策提供数据支持</li>
+        <li>🏗️ 建筑监测：实时监测建筑物变化，及时发现违规建筑和安全隐患</li>
+        <li>🏘️ 房地产评估：准确识别建筑类型和特征，为房地产价值评估提供参考</li>
+        <li>📊 数据分析：为政府部门和科研机构提供建筑数据统计分析服务</li>
+    </ul>
+    <h3>系统优势</h3>
+    <ul>
+        <li>🚀 高效：相比人工识别，效率提升80%以上</li>
+        <li>💵 经济：降低人工成本，节省运营开支</li>
+        <li>🔍 精准：采用深度学习算法，识别准确率高达95%</li>
+    </ul>
+</div>
+""", unsafe_allow_html=True)
+
+# 功能展示区域
+st.markdown("### 🚀 核心功能")
+col1, col2, col3, col4 = st.columns(4)
 
 with col1:
+    if st.button("🔍 单图识别", key="single_detection", use_container_width=True):
+        st.switch_page("pages/1_单图识别.py")
     st.markdown("""
-    <div style='background: linear-gradient(to bottom right, #0083B8, #00A3E0); color: white; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;'>
-        <h3 style='color: white;'>欢迎使用城市建筑物智能识别系统</h3>
-        <p style='color: white;'>本系统使用先进的深度学习技术，可以准确识别和分类不同类型的建筑物。</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # 系统功能介绍
-    st.markdown("### 🚀 核心功能")
-    st.markdown("""
-    <div class='feature-box'>
-        <div style='display: flex; justify-content: space-between;'>
-            <div style='flex: 1; margin: 0.5rem; padding: 1rem; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
-                <h4 style='color: #0083B8;'>🔍 智能识别</h4>
-                <p>上传建筑物图片，自动识别建筑类型</p>
-            </div>
-            <div style='flex: 1; margin: 0.5rem; padding: 1rem; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
-                <h4 style='color: #0083B8;'>📊 特征分析</h4>
-                <p>详细分析建筑特征和结构</p>
-            </div>
+        <div class='card'>
+            <h3>🔍 单图识别</h3>
+            <p>上传单张建筑物图片，系统将自动识别建筑类型，并提供详细的分析结果。支持多种建筑类型，识别准确率高。</p>
+            <ul>
+                <li>快速精准的识别</li>
+                <li>详细的分析报告</li>
+                <li>可视化结果展示</li>
+            </ul>
         </div>
-    </div>
     """, unsafe_allow_html=True)
 
 with col2:
-    # 使用指南
-    st.markdown("### 📖 快速开始")
+    if st.button("📑 批量识别", key="batch_detection", use_container_width=True):
+        st.switch_page("pages/2_批量识别.py")
     st.markdown("""
-    <div style='background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);'>
-        <div style='display: flex; align-items: center; margin-bottom: 1rem;'>
-            <div style='background: #0083B8; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 1rem;'>1</div>
-            <p style='margin: 0;'>点击左侧导航栏选择功能</p>
+        <div class='card'>
+            <h3>📑 批量识别</h3>
+            <p>同时上传多张图片进行批量识别，适合大规模建筑物分析任务。自动生成分析报告，提供数据导出功能。</p>
+            <ul>
+                <li>批量处理能力</li>
+                <li>自动报告生成</li>
+                <li>数据导出功能</li>
+            </ul>
         </div>
-        <div style='display: flex; align-items: center; margin-bottom: 1rem;'>
-            <div style='background: #0083B8; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 1rem;'>2</div>
-            <p style='margin: 0;'>上传建筑物图片</p>
-        </div>
-        <div style='display: flex; align-items: center;'>
-            <div style='background: #0083B8; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 1rem;'>3</div>
-            <p style='margin: 0;'>查看分析结果和历史记录</p>
-        </div>
-    </div>
     """, unsafe_allow_html=True)
 
-# 添加页脚
+with col3:
+    if st.button("🔄 变化检测", key="change_detection", use_container_width=True):
+        st.switch_page("pages/3_变化检测.py")
+    st.markdown("""
+        <div class='card'>
+            <h3>🔄 变化检测</h3>
+            <p>对比不同时期的建筑物图片，自动检测和标注建筑物的变化情况。帮助您快速发现建筑物的结构变化。</p>
+            <ul>
+                <li>自动变化检测</li>
+                <li>变化区域标注</li>
+                <li>变化程度分析</li>
+            </ul>
+        </div>
+    """, unsafe_allow_html=True)
+
+with col4:
+    if st.button("📊 历史记录", key="history_record", use_container_width=True):
+        st.switch_page("pages/4_历史记录.py")
+    st.markdown("""
+        <div class='card'>
+            <h3>📊 历史记录</h3>
+            <p>查看和管理所有历史检测记录，支持按时间、类型等多维度筛选。方便您追踪和对比历史识别结果。</p>
+            <ul>
+                <li>完整历史记录</li>
+                <li>多维度筛选</li>
+                <li>结果对比分析</li>
+            </ul>
+        </div>
+    """, unsafe_allow_html=True)
+
+# 使用说明区域
+st.markdown("### 📖 使用指南")
+st.markdown("""
+<div class='card'>
+    <h4>快速开始</h4>
+    <ol>
+        <li>选择需要使用的功能（单图识别/批量识别）</li>
+        <li>上传建筑物图片（支持.jpg、.jpeg、.png格式）</li>
+        <li>等待系统分析处理</li>
+        <li>查看识别结果和分析报告</li>
+    </ol>
+    <h4>支持的建筑物类型</h4>
+    <div style='display: flex; flex-wrap: wrap; gap: 1rem;'>
+        <div class='feature-card'>🏢 办公楼</div>
+        <div class='feature-card'>🏠 住宅楼</div>
+        <div class='feature-card'>🏪 商业建筑</div>
+        <div class='feature-card'>🏭 工业建筑</div>
+        <div class='feature-card'>🏫 教育建筑</div>
+        <div class='feature-card'>🏥 医疗建筑</div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+# 页脚
 st.markdown("---")
 st.markdown("""
 <div style='text-align: center; color: #666;'>
-    <p>© 2025 城市建筑物识别系统 | 技术支持：AIE52期-5组</p>
+    <p>© 2025 智能建筑物识别系统 | 技术支持：AIE52期-5组</p>
 </div>
 """, unsafe_allow_html=True)

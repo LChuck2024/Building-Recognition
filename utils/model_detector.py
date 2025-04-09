@@ -19,7 +19,7 @@ class ModelDetector:
 
         # 从文件名判断模型类型
         model_name_lower = self.model_name.lower()
-        if 'yolo' in model_name_lower or 'v8n' in model_name_lower:
+        if 'yolo' in model_name_lower or 'v8n' in model_name_lower or '12s' in model_name_lower:
             self.model_type = 'yolo'
         elif 'unet' in model_name_lower:
             self.model_type = 'unet'

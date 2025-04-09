@@ -32,11 +32,13 @@
 
 ## 技术特点
 
-- 基于深度学习的建筑物识别算法
+- 基于YOLOv8和UNet的深度学习建筑物识别算法
 - 针对无人机低空影像场景优化
-- 高效的批量处理能力
-- 友好的Web交互界面
+- 支持单图和批量识别的高效处理能力
+- 基于Streamlit的友好Web交互界面
 - 模块化设计，易于扩展
+- 支持建筑物变化检测和结果可视化
+- 集成数据库管理系统，支持历史记录查询
 
 ## 部署说明
 
@@ -73,19 +75,28 @@ Building-Recognition/
 ├── utils/              # 工具函数
 │   ├── __init__.py
 │   ├── db_manager.py   # 数据库管理工具
-│   └── model_detector.py # YOLO检测工具
+│   ├── model_detector.py # 目标检测工具
+│   ├── fcn_resnet50_model_test.py
+│   ├── test_db_manager.py
+│   └── unet_model_test.py
 ├── images/             # 界面资源
 │   ├── batch_header.svg
 │   ├── change_header.svg
 │   ├── home_header.svg
 │   └── single_header.svg
 ├── data/               # 数据文件
+│   ├── detection_results/
+│   │   ├── 1744116966_811F0309886A7EEA124B65641056E35830100218_w1920_h1280.jpg
+│   │   ├── 1744116967_811F0309886A7EEA124B65641056E35830100218_w1920_h1280.jpg
+│   │   └── ...
 │   └── history.db
-├── model/               # 数据文件
-│   ├── fcn_resnet50_model_best.pth # FCN模型文件
-│   ├── UNet_model_fold4.pth # Unet模型文件
-│   └── yolo11n.pt      # YOLO模型文件
-├── yolo11n.pt          # YOLO模型文件
+├── model/              # 模型文件
+│   ├── UNet_model_fold4.pth
+│   ├── UNet_model_fold4_0.13.pth
+│   ├── build_V8n.pt
+│   ├── fcn_resnet50_model_best.pth
+│   └── yolo11n.pt
+├── batch_recognition_results.xlsx
 └── requirements.txt    # 项目依赖
 ```
 

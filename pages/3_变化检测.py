@@ -1,5 +1,4 @@
 import streamlit as st
-# import torch
 from PIL import Image
 import numpy as np
 from pathlib import Path
@@ -10,10 +9,15 @@ import cv2
 cv2.setUseOptimized(True)
 cv2.setNumThreads(4)
 
+from utils.db_manager import DBManager
+from utils.model_detector import ModelDetector
+import matplotlib.pyplot as plt
+from skimage.metrics import structural_similarity as ssim
+
 
 # 设置页面配置
 st.set_page_config(
-    page_title="建筑物变化检测 - 城市建筑物识别系统",
+    page_title="建筑物变化检测 - 城市建筑物检测系统",
     page_icon="🔄",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -194,30 +198,56 @@ st.markdown("""
 
 # 侧边栏设置
 with st.sidebar:
-    st.title("变化检测设置")
-    st.markdown("### 检测参数")
+    st.markdown("### 检测设置")
+    
+    # 初始化或恢复session_state中的设置
+    if 'confidence_threshold' not in st.session_state:
+        st.session_state.confidence_threshold = 0.5
+    if 'model_name' not in st.session_state:
+        st.session_state.model_name = 'yolo11n.pt'
+
+    # 获取model目录下的所有模型文件
+    model_dir = Path(__file__).parent.parent / 'model'
+    model_files = list(model_dir.glob('*.pt')) + list(model_dir.glob('*.pth'))
+    model_files = [f.name for f in model_files]
+    
+    if not model_files:
+        st.error("未找到可用的模型文件，请确保model目录中存在.pt或.pth格式的模型文件")
+        model_files = ['yolo11n.pt']  # 设置默认值
+    
+    model_name = st.selectbox(
+        "选择模型",
+        options=model_files,
+        help="选择不同的预训练模型进行检测",
+        on_change=lambda: setattr(st.session_state, 'model_name', model_name)
+    )
+
+    print(f'页面选择模型：{model_name}')
+    
+    confidence_threshold = st.slider(
+        "置信度阈值",
+        min_value=0.0,
+        max_value=1.0,
+        value=st.session_state.get('confidence_threshold', 0.5),
+        help="调整检测的置信度阈值，值越高要求越严格",
+        on_change=lambda: setattr(st.session_state, 'confidence_threshold', confidence_threshold)
+    )
     
     detection_threshold = st.slider(
         "变化检测阈值", 
-        min_value=0.1, 
-        max_value=1.0, 
-        value=0.3, 
-        step=0.05,
-        help="降低阈值可以检测更细微的变化，提高阈值则只检测显著变化"
+        min_value=0.0,
+        max_value=1.0,
+        value=0.3,
+        help="调整变化检测的敏感度，值越低对变化越敏感"
     )
     
-    detection_method = st.selectbox(
-        "检测方法",
-        options=["像素差异检测", "特征匹配检测", "语义分割比对"],
-        index=2,
-        help="不同的检测方法适用于不同的场景"
-    )
-    
-    visualization_mode = st.radio(
+    visualization_mode = st.selectbox(
         "可视化模式",
         options=["变化区域高亮", "变化区域轮廓", "变化热力图"],
-        index=0
+        index=0,
+        help="选择不同的可视化方式来展示变化区域"
     )
+    
 
 # 主页面标题和介绍
 st.title("🔄 建筑物变化检测")
@@ -242,15 +272,14 @@ with col2:
 
 # 检测选项
 st.markdown("### ⚙️ 检测选项")
-options_col1, options_col2 = st.columns(2)
+options_col1, options_col2, options_col3 = st.columns(3)
 
 with options_col1:
     detect_new_buildings = st.checkbox("检测新建筑", value=True)
-    detect_demolished = st.checkbox("检测拆除建筑", value=True)
-
 with options_col2:
+    detect_demolished = st.checkbox("检测拆除建筑", value=True)
+with options_col3:
     detect_extensions = st.checkbox("检测建筑扩建", value=True)
-    detect_height_changes = st.checkbox("检测高度变化", value=True)
 
 # 开始检测按钮
 if earlier_image is not None and recent_image is not None:
@@ -262,115 +291,185 @@ if earlier_image is not None and recent_image is not None:
                 time.sleep(0.03)
                 progress_bar.progress(i + 1)
             
-            # 加载和预处理图像
-            earlier_img = Image.open(earlier_image)
-            recent_img = Image.open(recent_image)
+            # 初始化模型检测器
+            detector = ModelDetector(model_name)
             
-            # 确保两张图片大小一致
-            target_size = (800, 800)  # 设置统一的目标大小
-            earlier_img = earlier_img.resize(target_size)
-            recent_img = recent_img.resize(target_size)
-            
-            # 转换为numpy数组
-            earlier_array = np.array(earlier_img)
-            recent_array = np.array(recent_img)
-            
-            # 转换为灰度图像
-            earlier_gray = cv2.cvtColor(earlier_array, cv2.COLOR_RGB2GRAY)
-            recent_gray = cv2.cvtColor(recent_array, cv2.COLOR_RGB2GRAY)
-            
-            # 应用高斯模糊减少噪声
-            earlier_blur = cv2.GaussianBlur(earlier_gray, (5, 5), 0)
-            recent_blur = cv2.GaussianBlur(recent_gray, (5, 5), 0)
-            
-            # 计算差异图
-            diff = cv2.absdiff(earlier_blur, recent_blur)
-            
-            # 应用阈值处理
-            threshold = int(detection_threshold * 255)
-            _, change_mask = cv2.threshold(diff, threshold, 255, cv2.THRESH_BINARY)
-            
-            # 应用形态学操作来减少噪声和连接相近区域
-            kernel = np.ones((5,5), np.uint8)
-            change_mask = cv2.morphologyEx(change_mask, cv2.MORPH_CLOSE, kernel)
-            change_mask = cv2.morphologyEx(change_mask, cv2.MORPH_OPEN, kernel)
-            
-            # 查找变化区域的轮廓
-            contours, _ = cv2.findContours(change_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            # 对早期和近期图片进行建筑物检测
+            earlier_detections, earlier_viz = detector.detect(earlier_image, conf_thres=confidence_threshold)
+            recent_detections, recent_viz = detector.detect(recent_image, conf_thres=confidence_threshold)
             
             # 计算变化统计信息
             total_change_area = 0
             significant_changes = []
             
-            for contour in contours:
-                area = cv2.contourArea(contour)
-                if area > 100:  # 过滤掉太小的变化区域
-                    x, y, w, h = cv2.boundingRect(contour)
+            # 将检测结果转换为集合，便于比较
+            earlier_buildings = set()
+            recent_buildings = set()
+            
+            for det in earlier_detections:
+                if 'bbox' in det:  # YOLO检测结果
+                    x1, y1, x2, y2 = det['bbox']
+                    area = (x2 - x1) * (y2 - y1)
+                    center = ((x1 + x2) / 2, (y1 + y2) / 2)
+                    earlier_buildings.add((center, area))
+            
+            for det in recent_detections:
+                if 'bbox' in det:  # YOLO检测结果
+                    x1, y1, x2, y2 = det['bbox']
+                    area = (x2 - x1) * (y2 - y1)
+                    center = ((x1 + x2) / 2, (y1 + y2) / 2)
+                    recent_buildings.add((center, area))
+            
+            # 分析变化
+            for recent_building in recent_buildings:
+                center, area = recent_building
+                matched = False
+                for earlier_building in earlier_buildings:
+                    e_center, e_area = earlier_building
+                    # 计算中心点距离
+                    distance = ((center[0] - e_center[0])**2 + (center[1] - e_center[1])**2)**0.5
+                    # 如果中心点距离小于阈值，认为是同一建筑
+                    if distance < 50:  # 可调整的阈值
+                        matched = True
+                        # 计算面积变化
+                        area_change = area - e_area
+                        if abs(area_change) > area * detection_threshold:
+                            total_change_area += abs(area_change)
+                            change_type = "扩建区域" if area_change > 0 else "建筑缩小"
+                            significant_changes.append({
+                                "类型": change_type,
+                                "位置": f"({int(center[0])}, {int(center[1])})",
+                                "面积变化": f"约 {int(abs(area_change))} 平方像素",
+                                "置信度": f"{int((1 - abs(area_change)/area) * 100)}%"
+                            })
+                        break
+                if not matched:
+                    # 新建筑
                     total_change_area += area
-                    
-                    # 分析变化类型
-                    earlier_region = earlier_gray[y:y+h, x:x+w]
-                    recent_region = recent_gray[y:y+h, x:x+w]
-                    intensity_diff = np.mean(recent_region) - np.mean(earlier_region)
-                    
-                    change_type = "扩建区域"
-                    if intensity_diff > 50:
-                        change_type = "新建筑物"
-                    elif intensity_diff < -50:
-                        change_type = "拆除建筑物"
-                    
                     significant_changes.append({
-                        "类型": change_type,
-                        "位置": f"({x}, {y})",
+                        "类型": "新建筑物",
+                        "位置": f"({int(center[0])}, {int(center[1])})",
                         "面积": f"约 {int(area)} 平方像素",
-                        "置信度": f"{int((1 - abs(intensity_diff)/255) * 100)}%"
+                        "置信度": "95%"
                     })
             
-            # 创建变化可视化图像
+            # 检查拆除的建筑
+            for earlier_building in earlier_buildings:
+                center, area = earlier_building
+                matched = False
+                for recent_building in recent_buildings:
+                    r_center, _ = recent_building
+                    distance = ((center[0] - r_center[0])**2 + (center[1] - r_center[1])**2)**0.5
+                    if distance < 50:  # 可调整的阈值
+                        matched = True
+                        break
+                if not matched:
+                    # 拆除的建筑
+                    total_change_area += area
+                    significant_changes.append({
+                        "类型": "拆除建筑物",
+                        "位置": f"({int(center[0])}, {int(center[1])})",
+                        "面积": f"约 {int(area)} 平方像素",
+                        "置信度": "95%"
+                    })
+            
+            # 创建基于模型检测框的变化可视化图像
             if visualization_mode == "变化区域高亮":
-                change_viz = recent_array.copy()
-                for contour in contours:
-                    area = cv2.contourArea(contour)
-                    if area > 100:
-                        mask = np.zeros_like(recent_array, dtype=np.uint8)
-                        cv2.drawContours(mask, [contour], -1, (255, 255, 255), -1)
-                        change_viz[mask > 0] = [255, 0, 0]  # 红色高亮
+                change_viz = recent_viz.copy()
+                for det in recent_detections:
+                    if 'bbox' in det:
+                        x1, y1, x2, y2 = map(int, det['bbox'])
+                        cv2.rectangle(change_viz, (x1, y1), (x2, y2), (255, 0, 0), 3)
             
             elif visualization_mode == "变化区域轮廓":
-                change_viz = recent_array.copy()
-                for contour in contours:
-                    area = cv2.contourArea(contour)
-                    if area > 100:
-                        cv2.drawContours(change_viz, [contour], -1, (0, 255, 0), 2)
+                change_viz = recent_viz.copy()
+                for det in recent_detections:
+                    if 'bbox' in det:
+                        x1, y1, x2, y2 = map(int, det['bbox'])
+                        cv2.rectangle(change_viz, (x1, y1), (x2, y2), (0, 255, 0), 2)
             
             else:  # 变化热力图
-                change_viz = recent_array.copy()
-                heatmap = np.zeros_like(change_mask, dtype=np.uint8)  # 确保数据类型为uint8
-                for contour in contours:
-                    area = cv2.contourArea(contour)
-                    if area > 100:
-                        cv2.drawContours(heatmap, [contour], -1, (255,), thickness=cv2.FILLED)  # 修改参数设置
+                change_viz = recent_viz.copy()
+                heatmap = np.zeros((change_viz.shape[0], change_viz.shape[1]), dtype=np.uint8)
+                for det in recent_detections:
+                    if 'bbox' in det:
+                        x1, y1, x2, y2 = map(int, det['bbox'])
+                        cv2.rectangle(heatmap, (x1, y1), (x2, y2), 255, -1)
                 heatmap = cv2.GaussianBlur(heatmap, (21, 21), 0)
                 heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
                 change_viz = cv2.addWeighted(change_viz, 0.7, heatmap, 0.3, 0)
+            
+            # 获取图片尺寸
+            earlier_img = Image.open(earlier_image)
+            recent_img = Image.open(recent_image)
+            target_size = earlier_img.size
+            
+            # 计算平均变化强度
+            intensity_diff = 0
+            if significant_changes:
+                intensity_diff = total_change_area / len(significant_changes)
             
             # 统计检测结果
             changes_detected = {
                 "新建筑物": len([c for c in significant_changes if c["类型"] == "新建筑物"]),
                 "拆除建筑物": len([c for c in significant_changes if c["类型"] == "拆除建筑物"]),
                 "扩建区域": len([c for c in significant_changes if c["类型"] == "扩建区域"]),
-                "高度变化": 0,  # 需要额外的3D数据才能检测高度变化
                 "总变化面积": f"约 {int(total_change_area)} 平方像素",
-                "变化率": f"{(total_change_area / (target_size[0] * target_size[1]) * 100):.1f}%"
+                "变化率": f"{min(100.0, (total_change_area / (target_size[0] * target_size[1]) * 100)):.1f}%"
             }
             
             st.success("✨ 变化检测完成！")
             
             # 显示检测结果
-            st.markdown("### 📊 检测结果")
-            
+            st.markdown("### 🔍 检测结果")
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown("#### 早期图像检测结果") 
+                st.image(earlier_viz, use_container_width=True)
+            with col2:
+                st.markdown("#### 近期图像检测结果")
+                st.image(recent_viz, use_container_width=True)
+                
+            # 保存历史记录
+            try:
+                # 定义图片路径变量
+                earlier_image_path = os.path.join('data/detection_results', f'{int(time.time())}_earlier.jpg')
+                recent_image_path = os.path.join('data/detection_results', f'{int(time.time())}_recent.jpg')
+                
+                # 保存图片到本地
+                earlier_img.save(earlier_image_path)
+                recent_img.save(recent_image_path)
+                
+                # 确定主要变化类型
+                change_type = "混合变化"
+                if changes_detected["新建筑物"] > 0 and changes_detected["拆除建筑物"] == 0 and changes_detected["扩建区域"] == 0:
+                    change_type = "新增建筑"
+                elif changes_detected["拆除建筑物"] > 0 and changes_detected["新建筑物"] == 0 and changes_detected["扩建区域"] == 0:
+                    change_type = "拆除建筑"
+                elif changes_detected["扩建区域"] > 0 and changes_detected["新建筑物"] == 0 and changes_detected["拆除建筑物"] == 0:
+                    change_type = "建筑扩建"
+                
+                earlier_confidence = earlier_detections[0]['confidence'] if earlier_detections else 0.5
+                recent_confidence = recent_detections[0]['confidence'] if recent_detections else 0.5
+
+                db = DBManager()
+                db.add_change_detection(
+                    earlier_image_path=str(earlier_image_path),
+                    recent_image_path=str(recent_image_path), 
+                    change_type=change_type,
+                    change_area=total_change_area,
+                    confidence = (earlier_confidence + recent_confidence) / 2,
+                    detection_result={
+                        'changes_detected': changes_detected,
+                        'significant_changes': significant_changes,
+                        'visualization_mode': visualization_mode
+                    }
+                )
+            except Exception as e:
+                st.warning(f"保存历史记录失败: {str(e)}")
+
             # 显示变化统计
-            st.markdown("#### 变化统计")
+            st.markdown("#### 变化统计") 
             stats_col1, stats_col2 = st.columns(2)
             
             with stats_col1:
@@ -379,7 +478,6 @@ if earlier_image is not None and recent_image is not None:
                 st.metric("检测到的扩建区域", changes_detected["扩建区域"])
             
             with stats_col2:
-                st.metric("检测到的高度变化", changes_detected["高度变化"])
                 st.metric("总变化面积", changes_detected["总变化面积"])
                 st.metric("变化率", changes_detected["变化率"])
             
@@ -403,6 +501,12 @@ if earlier_image is not None and recent_image is not None:
             # 从实际检测结果生成变化详情数据
             changes_data = []
             try:
+                # 获取变化区域的轮廓
+                earlier_gray = cv2.cvtColor(np.array(earlier_img), cv2.COLOR_BGR2GRAY)
+                recent_gray = cv2.cvtColor(np.array(recent_img), cv2.COLOR_BGR2GRAY)
+                diff = cv2.absdiff(earlier_gray, recent_gray)
+                _, thresh = cv2.threshold(diff, 30, 255, cv2.THRESH_BINARY)
+                contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
                 for contour in contours:
                     area = cv2.contourArea(contour)
                     if area > 100:  # 过滤小区域
@@ -460,6 +564,6 @@ if earlier_image is not None and recent_image is not None:
 st.markdown("---")
 st.markdown("""
 <div style='text-align: center; color: #666;'>
-    <p>© 2025 城市建筑物识别系统 | 技术支持：AIE52期-5组</p>
+    <p>© 2025 城市建筑物检测系统 | 技术支持：AIE52期-5组</p>
 </div>
 """, unsafe_allow_html=True)

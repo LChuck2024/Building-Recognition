@@ -15,9 +15,11 @@ class ModelDetector:
         if not model_path.exists():
             raise FileNotFoundError(f"Model file not found: {model_path}")
         
+        print(f"Loading model: {model_path}")
+
         # 从文件名判断模型类型
         model_name_lower = self.model_name.lower()
-        if 'yolo' in model_name_lower:
+        if 'yolo' in model_name_lower or 'v8n' in model_name_lower:
             self.model_type = 'yolo'
         elif 'unet' in model_name_lower:
             self.model_type = 'unet'
@@ -36,12 +38,36 @@ class ModelDetector:
             self.model.eval()
         elif self.model_type in ['unet', 'fcn']:
             try:
-                self.model = torch.load(model_path, map_location=self.device)
-                if isinstance(self.model, dict):
-                    if 'state_dict' in self.model:
-                        # 如果是state_dict格式，直接加载状态字典
-                        self.model = self.model['state_dict']
-                    # 如果是完整的模型，直接使用
+                if self.model_type == 'fcn':
+                    from torchvision.models.segmentation import fcn_resnet50
+                    self.model = fcn_resnet50(pretrained=False, num_classes=1, aux_loss=True)
+                    # 加载状态字典
+                    state_dict = torch.load(model_path, map_location=self.device)
+                    if isinstance(state_dict, dict) and 'state_dict' in state_dict:
+                        state_dict = state_dict['state_dict']
+                    # 过滤掉辅助分类器的参数
+                    filtered_state_dict = {k: v for k, v in state_dict.items() if not k.startswith('aux_classifier')}
+                    self.model.load_state_dict(filtered_state_dict, strict=False)
+                elif self.model_type == 'unet':
+                    # 加载UNet模型
+                    import segmentation_models_pytorch as smp
+                    self.model = smp.Unet(
+                        encoder_name="efficientnet-b4",
+                        encoder_weights=None,
+                        in_channels=3,
+                        classes=1,
+                        encoder_depth=5,
+                        decoder_channels=(256, 128, 64, 32, 16),
+                        decoder_use_batchnorm=True
+                    )
+                    # 加载状态字典
+                    state_dict = torch.load(model_path, map_location=self.device)
+                    if isinstance(state_dict, dict):
+                        if 'state_dict' in state_dict:
+                            state_dict = state_dict['state_dict']
+                        elif 'model_state_dict' in state_dict:
+                            state_dict = state_dict['model_state_dict']
+                    self.model.load_state_dict(state_dict)
                 self.model = self.model.to(self.device)
                 self.model.eval()
             except Exception as e:
@@ -75,8 +101,8 @@ class ModelDetector:
         if self.model_type == 'yolo':
             results = self.model(image, conf=conf_thres, imgsz=image.size)
             detections = [{
-                'label': self.model.names[int(cls.item())],
-                'class': self.model.names[int(cls.item())],
+                'label': 'building',
+                'class': 'building',
                 'confidence': float(conf.item()),
                 'bbox': box.cpu().numpy().tolist(),
                 'width': image.width,
@@ -100,8 +126,8 @@ class ModelDetector:
                 pred = torch.argmax(output, dim=1).squeeze().cpu().numpy()
             
             detections = [{
-                'label': '建筑物',
-                'class': '建筑物',
+                'label': 'building',
+                'class': 'building',
                 'confidence': 1.0,
                 'segmentation': pred.tolist(),
                 'width': image.width,

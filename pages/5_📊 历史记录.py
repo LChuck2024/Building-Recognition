@@ -113,7 +113,7 @@ if detection_mode_counts is not None:
     col1, col2 = st.columns(2)
     with col1:
         # 按照页面顺序排序检测模式
-        detection_mode_order = ['单图检测', '批量检测', '变化检测']
+        detection_mode_order = ['单图检测', '批量检测', '变化检测', '模型比对']
         detection_mode_counts['detection_mode'] = pd.Categorical(
             detection_mode_counts['detection_mode'], 
             categories=detection_mode_order,
@@ -136,7 +136,7 @@ if detection_mode_counts is not None:
 st.markdown("### 🔍 筛选条件")
 
 # 选择记录类型
-record_type = st.selectbox("记录类型",options=["单图检测", "批量检测", "变化检测"],index=0)
+record_type = st.selectbox("记录类型",options=["单图检测", "批量检测", "变化检测", "模型比对"],index=0)
 # 根据记录类型显示不同的筛选选项
 if record_type == "单图检测" or record_type == "批量检测":
     confidence_range = st.slider(
@@ -150,7 +150,7 @@ if record_type == "单图检测" or record_type == "批量检测":
     else:
         history_records = db.get_batch_history(min_confidence=confidence_range[0], max_confidence=confidence_range[1])
     
-else:  # 变化检测
+elif record_type == "变化检测":
     min_confidence = st.slider(
         "最小置信度",
         min_value=0.0,
@@ -158,6 +158,8 @@ else:  # 变化检测
         value=0.7
     )
     history_records = db.get_change_history()
+else:  # 模型比对
+    history_records = db.get_model_comparison_history()
 
 # 添加清空按钮
 if st.button("⚠️ 清空所有历史记录", type="primary"):
@@ -203,7 +205,7 @@ else:
                 st.markdown("**批量结果：**")
                 st.json(json.loads(record['batch_result']))
             
-            else:  # 变化检测
+            elif record_type == "变化检测":
                 col1, col2 = st.columns(2)
                 with col1:
                     try:
@@ -225,6 +227,27 @@ else:
                 st.markdown(f"**变化类型：** {record['change_type']}")
                 st.markdown(f"**变化面积：** {record['change_area']:.2f} 平方像素")
                 st.markdown(f"**置信度：** {record['confidence']*100:.1f}%")
+                
+                # 显示检测结果
+                st.markdown("**检测结果：**")
+                st.json(json.loads(record['detection_result']))
+            
+            else:  # 模型比对
+                try:
+                    if Path(record['image_path']).exists():
+                        st.image(record['image_path'], caption="比对图片", use_container_width=True)
+                    else:
+                        st.warning(f"图片文件不存在: {record['image_path']}")
+                except Exception as e:
+                    st.error(f"加载图片时出错: {str(e)}")
+                
+                st.markdown(f"**比对模型：** {record['models']}")
+                st.markdown(f"**比对时间：** {record['detection_time']}")
+                
+                # 显示性能数据
+                performance_data = json.loads(record['performance_data'])
+                st.markdown("**性能数据：**")
+                st.table(pd.DataFrame(performance_data))
                 
                 # 显示检测结果
                 st.markdown("**检测结果：**")

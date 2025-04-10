@@ -123,6 +123,21 @@ class DBManager:
                         )
                     ''')
                     logger.info("创建users表成功")
+                
+                # 检查并创建模型比对历史记录表
+                cur = conn.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='model_comparison_history'")
+                if cur.fetchone() is None:
+                    conn.execute('''
+                        CREATE TABLE model_comparison_history (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            detection_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                            image_path TEXT NOT NULL,
+                            models TEXT NOT NULL,
+                            performance_data TEXT NOT NULL,
+                            detection_result TEXT NOT NULL
+                        )
+                    ''')
+                    logger.info("创建model_comparison_history表成功")
         except (SQLiteError, PermissionError, OSError) as e:
             raise Exception(f"数据库初始化失败: {str(e)}")
         except Exception as e:
@@ -171,6 +186,71 @@ class DBManager:
             logger.error(f"添加批量检测记录失败: {str(e)}")
             raise Exception(f"添加批量检测记录失败: {str(e)}")
     
+    def get_model_comparison_history(self):
+        """获取模型比对历史记录"""
+        logger.info("开始查询模型比对历史记录")
+        try:
+            with sqlite3.connect(self.db_path, timeout=20) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    SELECT 
+                        id,
+                        detection_time,
+                        image_path,
+                        models,
+                        performance_data,
+                        detection_result
+                    FROM model_comparison_history
+                    ORDER BY detection_time DESC
+                """)
+                records = cursor.fetchall()
+                
+                if not records:
+                    return None
+                
+                # 格式化结果
+                formatted_records = []
+                for record in records:
+                    formatted_records.append({
+                        'id': record[0],
+                        'detection_time': record[1],
+                        'image_path': record[2],
+                        'models': record[3],
+                        'performance_data': json.dumps(json.loads(record[4])),
+                        'detection_result': json.dumps(json.loads(record[5]))
+                    })
+                
+                return formatted_records
+                
+        except SQLiteError as e:
+            logger.error(f"查询模型比对历史记录失败: {str(e)}")
+            raise Exception(f"查询模型比对历史记录失败: {str(e)}")
+            
+    def add_model_comparison(self, image_path, models, performance_data, detection_result):
+        """添加模型比对记录"""
+        logger.info(f"开始添加模型比对记录，图片路径: {image_path}")
+        try:
+            # 数据验证
+            if not os.path.exists(image_path):
+                raise ValueError("图片路径不存在")
+            if not isinstance(models, str):
+                raise ValueError("models参数必须是字符串")
+            if not isinstance(performance_data, str):
+                raise ValueError("performance_data参数必须是JSON字符串")
+            if not isinstance(detection_result, str):
+                raise ValueError("detection_result参数必须是JSON字符串")
+                
+            with sqlite3.connect(self.db_path, timeout=20) as conn:
+                conn.execute(
+                    'INSERT INTO model_comparison_history (image_path, models, performance_data, detection_result) '
+                    'VALUES (?, ?, ?, ?)',
+                    (image_path, models, performance_data, detection_result)
+                )
+            logger.info(f"成功添加模型比对记录，模型: {models}")
+        except SQLiteError as e:
+            logger.error(f"添加模型比对记录失败: {str(e)}")
+            raise Exception(f"添加模型比对记录失败: {str(e)}")
+            
     def add_change_detection(self, earlier_image_path, recent_image_path, change_type, change_area, confidence, detection_result):
         """添加变化检测记录"""
         logger.info(f"开始添加变化检测记录，早期图片: {earlier_image_path}, 近期图片: {recent_image_path}")
@@ -325,6 +405,9 @@ class DBManager:
                     UNION ALL
                     SELECT '变化检测' as detection_mode, COUNT(*) as count
                     FROM change_detection_history
+                    UNION ALL
+                    SELECT '模型比对' as detection_mode, COUNT(*) as count
+                    FROM model_comparison_history
                     ORDER BY count DESC
                     """
                 ).fetchall()
@@ -346,6 +429,7 @@ class DBManager:
                 conn.execute('DELETE FROM detection_history')
                 conn.execute('DELETE FROM batch_detection_history')
                 conn.execute('DELETE FROM change_detection_history')
+                conn.execute('DELETE FROM model_comparison_history')
                 if reset_flag:
                     conn.execute('DELETE FROM sqlite_sequence')
                 conn.commit()
@@ -462,7 +546,8 @@ class DBManager:
                 single_count = conn.execute('SELECT COUNT(*) FROM detection_history').fetchone()[0]
                 batch_count = conn.execute('SELECT COUNT(*) FROM batch_detection_history').fetchone()[0]
                 change_count = conn.execute('SELECT COUNT(*) FROM change_detection_history').fetchone()[0]
-                total_detections = single_count + batch_count + change_count
+                comparison_count = conn.execute('SELECT COUNT(*) FROM model_comparison_history').fetchone()[0]
+                total_detections = single_count + batch_count + change_count + comparison_count
                 
                 # 获取所有置信度值并验证数据范围
                 confidence_values = []
@@ -501,7 +586,11 @@ class DBManager:
                     'SELECT COUNT(*) FROM change_detection_history WHERE date(detection_time) = ?', 
                     (today,)
                 ).fetchone()[0]
-                today_detections = today_single + today_batch + today_change
+                today_comparison = conn.execute(
+                    'SELECT COUNT(*) FROM model_comparison_history WHERE date(detection_time) = ?', 
+                    (today,)
+                ).fetchone()[0]
+                today_detections = today_single + today_batch + today_change + today_comparison
 
                 # 获取批量检测统计
                 batch_stats = conn.execute(

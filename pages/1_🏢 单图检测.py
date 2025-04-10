@@ -210,6 +210,18 @@ with st.sidebar:
         on_change=lambda: setattr(st.session_state, 'confidence_threshold', confidence_threshold)
     )
 
+    if 'iou_threshold' not in st.session_state:
+        st.session_state.iou_threshold = 0.45
+
+    iou_threshold = st.slider(
+        "IOU阈值",
+        min_value=0.0,
+        max_value=1.0,
+        value=st.session_state.get('iou_threshold', 0.45),
+        help="调整检测的IOU阈值，值越高要求越严格",
+        on_change=lambda: setattr(st.session_state, 'iou_threshold', iou_threshold)
+    )
+
 # 主页面标题和介绍
 st.title("🏢 单张图片检测")
 
@@ -253,7 +265,7 @@ if uploaded_file is not None:
                 st.stop()
             
             # 执行检测
-            detections, viz_img = detector.detect(image, conf_thres=confidence_threshold)
+            detections, viz_img = detector.detect(image, conf_thres=confidence_threshold,iou_thres = iou_threshold)
             
             # 确保viz_img是RGB格式的numpy数组
             if isinstance(viz_img, Image.Image):

@@ -2079,3 +2079,9 @@
 2025-04-10 23:55:14,049 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
 2025-04-10 23:55:14,053 - INFO - 数据库初始化成功
 2025-04-10 23:55:14,181 - INFO - 开始查询模型比对历史记录
+2025-04-10 23:57:05,471 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:57:05,477 - INFO - 数据库初始化成功
+2025-04-10 23:57:15,738 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:57:15,745 - INFO - 数据库初始化成功
+2025-04-10 23:57:15,829 - INFO - 开始获取单图检测历史记录
+2025-04-10 23:57:15,830 - INFO - 成功获取1条单图检测历史记录

@@ -315,7 +315,7 @@ if uploaded_files and start_batch_detect:
             st.markdown("""
             <div class='summary-box'>
                 <h3>平均置信度</h3>
-                <h2>{:.1f}%</h2>
+                <h2>{:.1f}</h2>
             </div>
             """.format(avg_confidence), unsafe_allow_html=True)
         with col3:

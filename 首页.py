@@ -1,5 +1,7 @@
 import streamlit as st
 from pathlib import Path
+from utils.db_manager import DBManager
+import os
 
 # 设置页面主题和样式
 st.set_page_config(
@@ -9,80 +11,212 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+
 # 自定义CSS样式
 st.markdown("""
 <style>
     /* 全局样式 */
     .main {
-        padding: 1rem;
+        padding: 1.5rem;
         width: 100%;
         max-width: 100%;
         margin: 0 auto;
         box-sizing: border-box;
+        background: linear-gradient(135deg, #f0f4f8 0%, #ffffff 100%);
     }
     body {
-        font-family: 'Helvetica Neue', sans-serif;
+        font-family: 'Helvetica Neue', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         font-size: 16px;
-        line-height: 1.5;
+        line-height: 1.6;
+        color: #2C3E50;
+        background: linear-gradient(135deg, #f0f4f8 0%, #ffffff 100%);
     }
     
     /* 卡片样式 */
     .card {
-        background: white;
-        padding: 1.5rem;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        margin-bottom: 1.5rem;
-        transition: all 0.3s ease;
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        padding: 2rem;
+        border-radius: 20px;
+        box-shadow: 0 8px 30px rgba(0,131,184,0.12);
+        margin-bottom: 2rem;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(0,131,184,0.08);
+        position: relative;
+        overflow: hidden;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
     }
     .card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        transform: translateY(-6px) scale(1.01);
+        box-shadow: 0 12px 40px rgba(0,131,184,0.18);
+        border-color: rgba(0,131,184,0.15);
+    }
+    .card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 200%;
+        height: 100%;
+        background: linear-gradient(120deg, transparent, rgba(255,255,255,0.6), transparent);
+        transform: translateX(-100%);
+        transition: 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .card:hover::after {
+        transform: translateX(100%);
     }
     
     /* 特性卡片 */
     .feature-card {
-        background: white;
-        padding: 1.2rem;
-        border-radius: 10px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        margin: 0.5rem;
-        transition: all 0.3s ease;
+        background: linear-gradient(145deg, #ffffff, #f8f9fa);
+        padding: 1.8rem;
+        border-radius: 18px;
+        box-shadow: 0 8px 25px rgba(0,131,184,0.1);
+        margin: 1rem;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(0,131,184,0.08);
+        position: relative;
+        overflow: hidden;
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
     }
     .feature-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 15px 35px rgba(0,131,184,0.15);
+        border-color: rgba(0,131,184,0.2);
+    }
+    .feature-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 150%;
+        height: 100%;
+        background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
+        transform: translateX(-100%) rotate(25deg);
+        transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .feature-card:hover::after {
+        transform: translateX(100%) rotate(25deg);
     }
     
     /* 图片样式 */
     img {
-        border-radius: 12px;
+        border-radius: 20px;
         max-width: 100%;
         height: auto;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        filter: brightness(1);
+    }
+    img:hover {
+        transform: scale(1.03);
+        filter: brightness(1.05);
+        box-shadow: 0 8px 25px rgba(0,131,184,0.15);
     }
     
     /* 标题和文本样式 */
     h1, h2, h3, h4 {
-        color: #2C3E50;
-        font-weight: 600;
-        margin-bottom: 1rem;
+        color: #1a202c;
+        font-weight: 700;
+        margin-bottom: 1.2rem;
+        letter-spacing: -0.02em;
+        transition: all 0.3s ease;
+    }
+    h1 {
+        font-size: 2.8rem;
+        background: linear-gradient(135deg, #0083B8, #00A3E0, #0083B8);
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: gradient 3s linear infinite;
+    }
+    @keyframes gradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
     }
     p {
-        color: #34495E;
-        line-height: 1.6;
-        margin-bottom: 1rem;
+        color: #4a5568;
+        line-height: 1.8;
+        margin-bottom: 1.2rem;
+    }
+    
+    /* 按钮样式 */
+    button {
+        background: linear-gradient(45deg, #0083B8, #00A3E0);
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 6px 20px rgba(0,131,184,0.25);
+        position: relative;
+        overflow: hidden;
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+    }
+    button:hover {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 8px 25px rgba(0,131,184,0.35);
+        background: linear-gradient(45deg, #00A3E0, #0083B8);
+    }
+    button::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 200%;
+        height: 100%;
+        background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+        transform: translateX(-100%);
+        transition: 0.6s;
+    }
+    button:hover::after {
+        transform: translateX(100%);
+    }
+    
+    /* 表单样式 */
+    input[type="text"],
+    input[type="password"] {
+        width: 100%;
+        padding: 1rem 1.2rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        margin-bottom: 1.2rem;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 1rem;
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+    input[type="text"]:hover,
+    input[type="password"]:hover {
+        border-color: #cbd5e0;
+        background: rgba(255, 255, 255, 0.95);
+    }
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+        border-color: #0083B8;
+        box-shadow: 0 0 0 4px rgba(0,131,184,0.15);
+        outline: none;
+        background: white;
     }
     
     /* 响应式布局 */
     @media (max-width: 768px) {
         .main {
-            padding: 0.5rem;
-        }
-        .card {
             padding: 1rem;
         }
+        .card {
+            padding: 1.2rem;
+        }
         h1 {
-            font-size: 1.8rem;
+            font-size: 2rem;
+        }
+        .feature-card {
+            margin: 0.5rem;
         }
     }
 </style>
@@ -95,6 +229,15 @@ current_dir = Path(__file__).parent
 st.image(f"{current_dir}/images/home_header.svg", use_container_width=True)
 st.title("🏢 智能建筑物识别系统")
 
+# 导入数据库管理器
+from utils.db_manager import DBManager
+
+# 初始化数据库管理器
+db = DBManager()
+
+# 获取统计信息
+stats = db.get_statistics()
+
 # 欢迎区域
 st.markdown("""
 <div style='background: linear-gradient(to right, #0083B8, #00A3E0); color: white; padding: 2rem; border-radius: 12px; margin-bottom: 2rem;'>
@@ -102,21 +245,72 @@ st.markdown("""
     <p style='color: white; font-size: 1.1rem;'>本系统采用先进的深度学习技术，为您提供精准的建筑物识别和分类服务。无论是单张图片识别还是批量处理，我们都能为您提供专业的解决方案。</p>
 </div>
 """, unsafe_allow_html=True)
+
+# 添加实时数据统计展示区
+st.markdown("### 📈 系统运行状态")
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.markdown(f"""
+    <div class='card' style='text-align: center;'>
+        <h3 style='color: #0083B8;'>{stats['total_detections']}</h3>
+        <p>总检测次数</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col2:
+    st.markdown(f"""
+    <div class='card' style='text-align: center;'>
+        <h3 style='color: #0083B8;'>{stats['avg_confidence']*100:.1f}%</h3>
+        <p>平均识别准确率</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col3:
+    st.markdown(f"""
+    <div class='card' style='text-align: center;'>
+        <h3 style='color: #0083B8;'>{stats.get('today_detections', 0)}</h3>
+        <p>今日检测次数</p>
+    </div>
+    """, unsafe_allow_html=True)
+
 with st.sidebar:
     # 使用说明区域
     st.markdown("### 📖 使用指南")
-    st.markdown("""
-    <div class='card'>
-        <h4>快速开始</h4>
-        <ol>
-            <li>选择需要使用的功能</li>
-            <li>上传建筑物图片</li>
-            <li>点击开始检测</li>
-            <li>等待系统分析处理</li>
-            <li>查看识别结果和分析报告</li>
-        </ol>
-    </div>
-    """, unsafe_allow_html=True)
+    
+    # 主要功能说明
+    with st.expander("🎯 功能选择"):
+        st.markdown("""
+        - 🏢 **单图识别**：单张建筑物图片分析
+        - 📑 **批量识别**：多张图片批量处理
+        - 🔄 **变化检测**：建筑物变化分析
+        """)
+    
+    # 图片要求说明
+    with st.expander("📸 图片要求"):
+        st.markdown("""
+        - 📁 格式：JPG、PNG、JPEG
+        - 🖼️ 分辨率：≥1024×1024
+        - 📦 大小：≤10MB
+        """)
+    
+    # 使用流程说明
+    with st.expander("📝 操作步骤"):
+        st.markdown("""
+        1. 选择所需功能模块
+        2. 上传符合要求的图片
+        3. 等待系统分析处理
+        4. 查看分析结果报告
+        """)
+    
+    # 注意事项
+    with st.expander("⚠️ 注意事项"):
+        st.markdown("""
+        - 请确保图片清晰度良好
+        - 建议图片中建筑物占比较大
+        - 分析结果仅供参考
+        """)
+
 
 # 功能展示区域
 st.markdown("### 🚀 核心功能")
@@ -153,7 +347,6 @@ with col4:
             <p>查看和管理所有历史检测记录，支持按时间、类型等多维度筛选。方便您追踪和对比历史识别结果。</p>
         </div>
     """, unsafe_allow_html=True)
-
 
 # 项目背景与价值
 st.markdown("### 🌟 项目背景与价值")

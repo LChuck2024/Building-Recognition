@@ -1801,3 +1801,281 @@
 2025-04-10 21:46:25,074 - INFO - 数据库初始化成功
 2025-04-10 21:50:03,275 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
 2025-04-10 21:50:03,292 - INFO - 数据库初始化成功
+2025-04-10 22:23:41,332 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 22:23:41,347 - INFO - 数据库初始化成功
+2025-04-10 22:25:38,126 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 22:25:38,134 - INFO - 数据库初始化成功
+2025-04-10 22:26:26,948 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 22:26:26,951 - INFO - 数据库初始化成功
+2025-04-10 22:26:26,960 - INFO - 开始添加单图检测记录，图片路径: data/detection_results/1744295186_3MZMOW7WO7.jpg
+2025-04-10 22:26:26,962 - INFO - 成功添加单图检测记录，建筑类型: building, 置信度: 0.9489113688468933
+2025-04-10 22:26:51,018 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 22:26:51,025 - INFO - 数据库初始化成功
+2025-04-10 22:28:15,051 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 22:28:15,055 - INFO - 数据库初始化成功
+2025-04-10 22:28:26,024 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 22:28:26,028 - INFO - 数据库初始化成功
+2025-04-10 22:28:26,041 - INFO - 开始添加单图检测记录，图片路径: data/detection_results/1744295306_2WAZNMB8TI.jpg
+2025-04-10 22:28:26,042 - INFO - 成功添加单图检测记录，建筑类型: building, 置信度: 0.9658675789833069
+2025-04-10 22:31:22,189 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 22:31:22,201 - INFO - 数据库初始化成功
+2025-04-10 22:31:22,212 - INFO - 开始添加单图检测记录，图片路径: data/detection_results/1744295482_3MVOOO2GK0.jpg
+2025-04-10 22:31:22,248 - INFO - 成功添加单图检测记录，建筑类型: building, 置信度: 1.0
+2025-04-10 22:31:47,637 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 22:31:47,645 - INFO - 数据库初始化成功
+2025-04-10 22:31:52,272 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 22:31:52,275 - INFO - 数据库初始化成功
+2025-04-10 22:32:08,892 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 22:32:08,899 - INFO - 数据库初始化成功
+2025-04-10 22:32:08,915 - INFO - 开始添加单图检测记录，图片路径: data/detection_results/1744295528_3MZMOW7WO7.jpg
+2025-04-10 22:32:08,919 - INFO - 成功添加单图检测记录，建筑类型: building, 置信度: 0.9489113688468933
+2025-04-10 22:33:07,739 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 22:33:07,754 - INFO - 数据库初始化成功
+2025-04-10 22:33:07,755 - INFO - 开始添加批量检测记录，总图片数: 13
+2025-04-10 22:33:07,756 - INFO - 成功添加批量检测记录，成功数: 6, 失败数: 7, 平均置信度: 0.9172
+2025-04-10 22:33:21,540 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 22:33:21,551 - INFO - 数据库初始化成功
+2025-04-10 22:33:21,697 - INFO - 开始获取单图检测历史记录
+2025-04-10 22:33:21,701 - INFO - 成功获取12条单图检测历史记录
+2025-04-10 22:34:13,820 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 22:34:13,840 - INFO - 数据库初始化成功
+2025-04-10 22:34:13,841 - INFO - 开始添加变化检测记录，早期图片: data/detection_results/1744295653_earlier.jpg, 近期图片: data/detection_results/1744295653_recent.jpg
+2025-04-10 22:34:13,842 - INFO - 成功添加变化检测记录，变化类型: 拆除建筑, 变化面积: 30652.58534074668
+2025-04-10 22:35:16,578 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 22:35:16,689 - INFO - 数据库初始化成功
+2025-04-10 22:35:37,109 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 22:35:37,121 - INFO - 数据库初始化成功
+2025-04-10 22:35:38,925 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 22:35:38,929 - INFO - 数据库初始化成功
+2025-04-10 22:38:03,443 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 22:38:03,470 - INFO - 数据库初始化成功
+2025-04-10 22:38:03,514 - INFO - 开始获取单图检测历史记录
+2025-04-10 22:38:03,520 - INFO - 成功获取12条单图检测历史记录
+2025-04-10 22:38:05,118 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 22:38:05,125 - INFO - 数据库初始化成功
+2025-04-10 22:38:05,178 - INFO - 开始获取单图检测历史记录
+2025-04-10 22:38:05,181 - INFO - 成功获取12条单图检测历史记录
+2025-04-10 22:44:15,947 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 22:44:15,956 - INFO - 数据库初始化成功
+2025-04-10 22:44:49,172 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 22:44:49,178 - INFO - 数据库初始化成功
+2025-04-10 22:44:49,854 - INFO - 开始获取单图检测历史记录
+2025-04-10 22:44:49,857 - INFO - 成功获取12条单图检测历史记录
+2025-04-10 22:44:52,828 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 22:44:52,830 - INFO - 数据库初始化成功
+2025-04-10 22:44:52,867 - INFO - 开始获取单图检测历史记录
+2025-04-10 22:44:52,879 - INFO - 成功获取12条单图检测历史记录
+2025-04-10 22:51:02,595 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 22:51:02,605 - INFO - 数据库初始化成功
+2025-04-10 22:51:02,612 - INFO - 开始添加单图检测记录，图片路径: data/detection_results/1744296662_3H23W1BQGK.jpg
+2025-04-10 22:51:02,613 - INFO - 成功添加单图检测记录，建筑类型: building, 置信度: 0.8404744267463684
+2025-04-10 22:51:09,956 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 22:51:09,959 - INFO - 数据库初始化成功
+2025-04-10 22:51:09,964 - INFO - 开始添加单图检测记录，图片路径: data/detection_results/1744296669_3H23W1BQGK.jpg
+2025-04-10 22:51:09,965 - INFO - 成功添加单图检测记录，建筑类型: building, 置信度: 0.8404744267463684
+2025-04-10 22:51:17,678 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 22:51:17,681 - INFO - 数据库初始化成功
+2025-04-10 22:51:17,687 - INFO - 开始添加单图检测记录，图片路径: data/detection_results/1744296677_3VF35HMWLA.jpg
+2025-04-10 22:51:17,688 - INFO - 成功添加单图检测记录，建筑类型: building, 置信度: 0.9081177711486816
+2025-04-10 22:51:26,366 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 22:51:26,368 - INFO - 数据库初始化成功
+2025-04-10 22:51:26,374 - INFO - 开始添加单图检测记录，图片路径: data/detection_results/1744296686_3VF35HMWLA.jpg
+2025-04-10 22:51:26,374 - INFO - 成功添加单图检测记录，建筑类型: building, 置信度: 0.9081177711486816
+2025-04-10 22:51:32,294 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 22:51:32,296 - INFO - 数据库初始化成功
+2025-04-10 22:51:32,303 - INFO - 开始添加单图检测记录，图片路径: data/detection_results/1744296692_3GFLE1PPWR.jpg
+2025-04-10 22:51:32,304 - INFO - 成功添加单图检测记录，建筑类型: building, 置信度: 0.842494547367096
+2025-04-10 22:51:58,668 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 22:51:58,671 - INFO - 数据库初始化成功
+2025-04-10 22:51:58,671 - INFO - 开始添加批量检测记录，总图片数: 12
+2025-04-10 22:51:58,672 - INFO - 成功添加批量检测记录，成功数: 12, 失败数: 0, 平均置信度: 0.9053
+2025-04-10 22:52:55,461 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 22:52:55,469 - INFO - 数据库初始化成功
+2025-04-10 22:52:55,469 - INFO - 开始添加批量检测记录，总图片数: 12
+2025-04-10 22:52:55,470 - INFO - 成功添加批量检测记录，成功数: 12, 失败数: 0, 平均置信度: 0.9053
+2025-04-10 22:53:16,672 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 22:53:16,679 - INFO - 数据库初始化成功
+2025-04-10 22:53:16,679 - INFO - 开始添加批量检测记录，总图片数: 12
+2025-04-10 22:53:16,679 - INFO - 成功添加批量检测记录，成功数: 12, 失败数: 0, 平均置信度: 0.9053
+2025-04-10 22:56:43,507 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 22:56:43,518 - INFO - 数据库初始化成功
+2025-04-10 22:56:43,587 - INFO - 开始获取单图检测历史记录
+2025-04-10 22:56:43,589 - INFO - 成功获取17条单图检测历史记录
+2025-04-10 22:58:08,373 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 22:58:08,389 - INFO - 数据库初始化成功
+2025-04-10 22:58:08,461 - INFO - 开始获取单图检测历史记录
+2025-04-10 22:58:08,464 - INFO - 成功获取17条单图检测历史记录
+2025-04-10 23:17:31,260 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:17:31,427 - INFO - 数据库初始化成功
+2025-04-10 23:17:32,838 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:17:32,872 - INFO - 数据库初始化成功
+2025-04-10 23:17:55,177 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:17:55,193 - INFO - 数据库初始化成功
+2025-04-10 23:17:57,215 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:17:57,223 - INFO - 数据库初始化成功
+2025-04-10 23:18:24,970 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:18:24,992 - INFO - 数据库初始化成功
+2025-04-10 23:18:28,905 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:18:28,908 - INFO - 数据库初始化成功
+2025-04-10 23:18:30,049 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:18:30,050 - INFO - 数据库初始化成功
+2025-04-10 23:18:35,352 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:18:35,359 - INFO - 数据库初始化成功
+2025-04-10 23:18:37,686 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:18:37,690 - INFO - 数据库初始化成功
+2025-04-10 23:18:47,894 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:18:47,896 - INFO - 数据库初始化成功
+2025-04-10 23:18:57,562 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:18:57,563 - INFO - 数据库初始化成功
+2025-04-10 23:19:03,872 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:19:03,875 - INFO - 数据库初始化成功
+2025-04-10 23:19:04,233 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:19:04,235 - INFO - 数据库初始化成功
+2025-04-10 23:19:30,885 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:19:30,889 - INFO - 数据库初始化成功
+2025-04-10 23:19:34,759 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:19:34,763 - INFO - 数据库初始化成功
+2025-04-10 23:19:37,463 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:19:37,465 - INFO - 数据库初始化成功
+2025-04-10 23:19:52,820 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:19:52,827 - INFO - 数据库初始化成功
+2025-04-10 23:19:56,608 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:19:56,731 - INFO - 数据库初始化成功
+2025-04-10 23:20:47,024 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:20:47,136 - INFO - 数据库初始化成功
+2025-04-10 23:21:04,362 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:21:04,372 - INFO - 数据库初始化成功
+2025-04-10 23:21:06,036 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:21:06,038 - INFO - 数据库初始化成功
+2025-04-10 23:22:23,219 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:22:23,240 - INFO - 数据库初始化成功
+2025-04-10 23:23:38,853 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:23:38,862 - INFO - 数据库初始化成功
+2025-04-10 23:23:40,637 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:23:40,640 - INFO - 数据库初始化成功
+2025-04-10 23:23:47,167 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:23:47,171 - INFO - 数据库初始化成功
+2025-04-10 23:25:10,116 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:25:10,216 - INFO - 数据库初始化成功
+2025-04-10 23:25:10,411 - INFO - 开始获取单图检测历史记录
+2025-04-10 23:25:10,416 - INFO - 成功获取17条单图检测历史记录
+2025-04-10 23:25:59,538 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:25:59,550 - INFO - 数据库初始化成功
+2025-04-10 23:25:59,649 - INFO - 开始获取单图检测历史记录
+2025-04-10 23:25:59,653 - INFO - 成功获取17条单图检测历史记录
+2025-04-10 23:26:39,095 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:26:39,124 - INFO - 数据库初始化成功
+2025-04-10 23:26:49,515 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:26:49,520 - INFO - 创建model_comparison_history表成功
+2025-04-10 23:26:49,520 - INFO - 数据库初始化成功
+2025-04-10 23:26:49,554 - INFO - 开始获取单图检测历史记录
+2025-04-10 23:26:49,557 - INFO - 成功获取17条单图检测历史记录
+2025-04-10 23:27:26,660 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:27:26,668 - INFO - 数据库初始化成功
+2025-04-10 23:28:03,050 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:28:03,055 - INFO - 数据库初始化成功
+2025-04-10 23:28:50,186 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:28:50,190 - INFO - 数据库初始化成功
+2025-04-10 23:29:14,041 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:29:14,049 - INFO - 数据库初始化成功
+2025-04-10 23:29:46,922 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:29:46,933 - INFO - 数据库初始化成功
+2025-04-10 23:30:10,229 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:30:10,244 - INFO - 数据库初始化成功
+2025-04-10 23:30:10,255 - INFO - 开始添加模型比对记录，图片路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/temp/comparison_1744299010.jpg
+2025-04-10 23:30:10,257 - INFO - 成功添加模型比对记录，模型: build-12s.pt,build_V8n.pt
+2025-04-10 23:30:13,111 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:30:13,118 - INFO - 数据库初始化成功
+2025-04-10 23:30:13,204 - INFO - 开始获取单图检测历史记录
+2025-04-10 23:30:13,211 - INFO - 成功获取17条单图检测历史记录
+2025-04-10 23:30:16,274 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:30:16,278 - INFO - 数据库初始化成功
+2025-04-10 23:30:16,343 - INFO - 开始获取单图检测历史记录
+2025-04-10 23:30:16,346 - INFO - 成功获取17条单图检测历史记录
+2025-04-10 23:30:23,472 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:30:23,475 - INFO - 数据库初始化成功
+2025-04-10 23:30:23,518 - INFO - 开始获取单图检测历史记录
+2025-04-10 23:30:23,562 - INFO - 成功获取17条单图检测历史记录
+2025-04-10 23:30:23,662 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:30:23,663 - INFO - 数据库初始化成功
+2025-04-10 23:30:23,688 - INFO - 开始获取单图检测历史记录
+2025-04-10 23:30:23,689 - INFO - 成功获取0条单图检测历史记录
+2025-04-10 23:30:33,835 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:30:33,838 - INFO - 数据库初始化成功
+2025-04-10 23:30:33,844 - INFO - 开始添加模型比对记录，图片路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/temp/comparison_1744299033.jpg
+2025-04-10 23:30:33,845 - INFO - 成功添加模型比对记录，模型: build-12s.pt,build_V8n.pt
+2025-04-10 23:30:36,518 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:30:36,519 - INFO - 数据库初始化成功
+2025-04-10 23:30:36,574 - INFO - 开始获取单图检测历史记录
+2025-04-10 23:30:36,575 - INFO - 成功获取0条单图检测历史记录
+2025-04-10 23:31:52,067 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:31:52,075 - INFO - 数据库初始化成功
+2025-04-10 23:31:52,515 - INFO - 开始获取单图检测历史记录
+2025-04-10 23:31:52,519 - INFO - 成功获取0条单图检测历史记录
+2025-04-10 23:32:08,403 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:32:08,407 - INFO - 数据库初始化成功
+2025-04-10 23:36:23,523 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:36:23,529 - INFO - 数据库初始化成功
+2025-04-10 23:36:23,556 - INFO - 开始添加单图检测记录，图片路径: data/detection_results/1744299383_3GFLE1PPWR.jpg
+2025-04-10 23:36:23,557 - INFO - 成功添加单图检测记录，建筑类型: building, 置信度: 0.842494547367096
+2025-04-10 23:36:40,929 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:36:40,941 - INFO - 数据库初始化成功
+2025-04-10 23:36:40,941 - INFO - 开始添加批量检测记录，总图片数: 6
+2025-04-10 23:36:40,945 - INFO - 成功添加批量检测记录，成功数: 6, 失败数: 0, 平均置信度: 0.8425
+2025-04-10 23:36:53,455 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:36:53,462 - INFO - 数据库初始化成功
+2025-04-10 23:36:53,468 - INFO - 开始添加模型比对记录，图片路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/temp/comparison_1744299413.jpg
+2025-04-10 23:36:53,468 - INFO - 成功添加模型比对记录，模型: build-12s.pt,build_V8n.pt
+2025-04-10 23:37:08,345 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:37:08,347 - INFO - 数据库初始化成功
+2025-04-10 23:37:08,347 - INFO - 开始添加变化检测记录，早期图片: data/detection_results/1744299428_earlier.jpg, 近期图片: data/detection_results/1744299428_recent.jpg
+2025-04-10 23:37:08,348 - INFO - 成功添加变化检测记录，变化类型: 混合变化, 变化面积: 86220.53068203965
+2025-04-10 23:37:14,735 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:37:14,740 - INFO - 数据库初始化成功
+2025-04-10 23:37:14,798 - INFO - 开始获取单图检测历史记录
+2025-04-10 23:37:14,799 - INFO - 成功获取1条单图检测历史记录
+2025-04-10 23:37:18,834 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:37:18,836 - INFO - 数据库初始化成功
+2025-04-10 23:37:18,880 - INFO - 开始查询模型比对历史记录
+2025-04-10 23:38:20,220 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:38:20,228 - INFO - 数据库初始化成功
+2025-04-10 23:38:20,405 - INFO - 开始查询模型比对历史记录
+2025-04-10 23:39:56,493 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:39:56,527 - INFO - 数据库初始化成功
+2025-04-10 23:39:56,744 - INFO - 开始查询模型比对历史记录
+2025-04-10 23:40:21,856 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:40:21,867 - INFO - 数据库初始化成功
+2025-04-10 23:40:21,874 - INFO - 开始添加模型比对记录，图片路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/temp/comparison_1744299621.jpg
+2025-04-10 23:40:21,875 - INFO - 成功添加模型比对记录，模型: build-12s.pt,build_V8n.pt
+2025-04-10 23:42:51,616 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:42:51,679 - INFO - 数据库初始化成功
+2025-04-10 23:42:51,697 - INFO - 开始添加模型比对记录，图片路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/temp/comparison_1744299771.jpg
+2025-04-10 23:42:51,705 - INFO - 成功添加模型比对记录，模型: build-12s.pt,build_V8n.pt
+2025-04-10 23:43:02,051 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:43:02,054 - INFO - 数据库初始化成功
+2025-04-10 23:43:02,060 - INFO - 开始添加模型比对记录，图片路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/temp/comparison_1744299782.jpg
+2025-04-10 23:43:02,061 - INFO - 成功添加模型比对记录，模型: build-12s.pt,build_V8n.pt
+2025-04-10 23:51:11,124 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:51:11,133 - INFO - 数据库初始化成功
+2025-04-10 23:51:11,139 - INFO - 开始添加模型比对记录，图片路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/temp/comparison_1744300271.jpg
+2025-04-10 23:51:11,140 - INFO - 成功添加模型比对记录，模型: build-12s.pt,build_V8n.pt
+2025-04-10 23:53:32,060 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:53:32,066 - INFO - 数据库初始化成功
+2025-04-10 23:53:32,073 - INFO - 开始添加模型比对记录，图片路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/temp/comparison_1744300412.jpg
+2025-04-10 23:53:32,074 - INFO - 成功添加模型比对记录，模型: build-12s.pt,build_V8n.pt
+2025-04-10 23:54:09,396 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:54:09,401 - INFO - 数据库初始化成功
+2025-04-10 23:54:09,450 - INFO - 开始获取单图检测历史记录
+2025-04-10 23:54:09,451 - INFO - 成功获取1条单图检测历史记录
+2025-04-10 23:54:27,021 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:54:27,027 - INFO - 数据库初始化成功
+2025-04-10 23:54:27,075 - INFO - 开始获取单图检测历史记录
+2025-04-10 23:54:27,076 - INFO - 成功获取1条单图检测历史记录
+2025-04-10 23:54:33,931 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:54:33,933 - INFO - 数据库初始化成功
+2025-04-10 23:54:33,969 - INFO - 开始查询模型比对历史记录
+2025-04-10 23:55:14,001 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:55:14,004 - INFO - 数据库初始化成功
+2025-04-10 23:55:14,049 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-项目实战/Building-Recognition/data/history.db
+2025-04-10 23:55:14,053 - INFO - 数据库初始化成功
+2025-04-10 23:55:14,181 - INFO - 开始查询模型比对历史记录

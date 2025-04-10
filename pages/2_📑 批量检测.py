@@ -188,6 +188,17 @@ with st.sidebar:
         on_change=lambda: setattr(st.session_state, 'confidence_threshold', confidence_threshold)
     )
 
+    if 'iou_threshold' not in st.session_state:
+        st.session_state.iou_threshold = 0.45
+
+    iou_threshold = st.slider(
+        "IOU阈值",
+        min_value=0.0,
+        max_value=1.0,
+        value=st.session_state.get('iou_threshold', 0.45),
+        help="调整检测的IOU阈值，值越高要求越严格",
+        on_change=lambda: setattr(st.session_state, 'iou_threshold', iou_threshold)
+    )
 
 # 文件上传区域
 st.markdown("### 📤 上传图片")
@@ -248,7 +259,7 @@ if uploaded_files and start_batch_detect:
             
             try:
                 # 执行检测
-                detections, plotted_image = detector.detect(file, conf_thres=confidence_threshold)
+                detections, plotted_image = detector.detect(file, conf_thres=confidence_threshold ,iou_thres = iou_threshold)
                 
                 # 获取检测结果统计
                 if detections:

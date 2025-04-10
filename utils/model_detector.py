@@ -95,11 +95,12 @@ class ModelDetector:
         except Exception as e:
             raise ValueError(f"Error processing image: {str(e)}")
     
-    def detect(self, image, conf_thres=0.5, preview_size=None):
+    def detect(self, image, conf_thres=0.5, iou_thres=0.45, preview_size=None):
         image = self.preprocess_image(image)
         
         if self.model_type == 'yolo':
-            results = self.model(image, conf=conf_thres, imgsz=image.size)
+            print(f'Using IOU threshold: {iou_thres}')
+            results = self.model(image, conf=conf_thres, iou=iou_thres, imgsz=image.size, verbose=False)
             detections = [{
                 'label': 'building',
                 'class': 'building',

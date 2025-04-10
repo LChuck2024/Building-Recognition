@@ -253,24 +253,24 @@ col1, col2, col3 = st.columns(3)
 with col1:
     st.markdown(f"""
     <div class='card' style='text-align: center;'>
-        <h3 style='color: #0083B8;'>{stats['total_detections']}</h3>
-        <p>总检测次数</p>
+        <h3 style='color: #0083B8; text-align: center;'>{stats['total_detections']}</h3>
+        <p style='text-align: center;'>总检测次数</p>
     </div>
     """, unsafe_allow_html=True)
 
 with col2:
     st.markdown(f"""
     <div class='card' style='text-align: center;'>
-        <h3 style='color: #0083B8;'>{stats['avg_confidence']*100:.1f}%</h3>
-        <p>平均识别准确率</p>
+        <h3 style='color: #0083B8; text-align: center;'>{stats['avg_confidence']:.2f}</h3>
+        <p style='text-align: center;'>平均置信度</p>
     </div>
     """, unsafe_allow_html=True)
 
 with col3:
     st.markdown(f"""
     <div class='card' style='text-align: center;'>
-        <h3 style='color: #0083B8;'>{stats.get('today_detections', 0)}</h3>
-        <p>今日检测次数</p>
+        <h3 style='color: #0083B8; text-align: center;'>{stats.get('today_detections', 0)}</h3>
+        <p style='text-align: center;'>今日检测次数</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -283,7 +283,9 @@ with st.sidebar:
         st.markdown("""
         - 🏢 **单图识别**：单张建筑物图片分析
         - 📑 **批量识别**：多张图片批量处理
+        - 🔍 **模型比对**：比较不同模型的检测效果
         - 🔄 **变化检测**：建筑物变化分析
+        - 📊 **历史记录**：查看和管理历史检测记录
         """)
     
     # 图片要求说明
@@ -314,7 +316,7 @@ with st.sidebar:
 
 # 功能展示区域
 st.markdown("### 🚀 核心功能")
-col1, col2, col3, col4 = st.columns(4)
+col1, col2, col3, col4, col5 = st.columns(5)
 
 with col1:
     st.markdown("""
@@ -335,12 +337,20 @@ with col2:
 with col3:
     st.markdown("""
         <div class='card'>
+            <h5>🔍 模型对比</h5>
+            <p>比较不同模型的检测效果，直观展示各模型在精度、速度和资源消耗等方面的差异，帮助您选择最适合的模型。</p>
+        </div>
+    """, unsafe_allow_html=True)
+
+with col4:
+    st.markdown("""
+        <div class='card'>
             <h5>🔄 变化检测</h5>
             <p>对比不同时期的建筑物图片，自动检测和标注建筑物的变化情况。帮助您快速发现建筑物的结构变化。</p>
         </div>
     """, unsafe_allow_html=True)
 
-with col4:
+with col5:
     st.markdown("""
         <div class='card'>
             <h5>📊 历史记录</h5>

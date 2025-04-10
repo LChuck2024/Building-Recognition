@@ -1,5 +1,5 @@
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 import os
 import logging
@@ -55,6 +55,7 @@ class DBManager:
                     conn.execute('DROP TABLE IF EXISTS detection_history')
                     conn.execute('DROP TABLE IF EXISTS batch_detection_history')
                     conn.execute('DROP TABLE IF EXISTS change_detection_history')
+                    conn.execute('DROP TABLE IF EXISTS users')
                 
                 # 检查表是否存在，不存在则创建
                 # 检查并创建单图检测历史记录表
@@ -106,6 +107,22 @@ class DBManager:
                         )
                     ''')
                     logger.info("创建change_detection_history表成功")
+                
+                # 检查并创建用户表
+                cur = conn.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='users'")
+                if cur.fetchone() is None:
+                    conn.execute('''
+                        CREATE TABLE users (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            username TEXT NOT NULL UNIQUE,
+                            password_hash TEXT NOT NULL,
+                            email TEXT UNIQUE,
+                            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                            last_login TIMESTAMP,
+                            is_active BOOLEAN DEFAULT 1
+                        )
+                    ''')
+                    logger.info("创建users表成功")
         except (SQLiteError, PermissionError, OSError) as e:
             raise Exception(f"数据库初始化失败: {str(e)}")
         except Exception as e:
@@ -335,6 +352,108 @@ class DBManager:
         except SQLiteError as e:
             raise Exception(f"清空历史记录失败: {str(e)}")
     
+    def register_user(self, username, password, email=None):
+        """注册新用户
+        Args:
+            username: 用户名
+            password: 密码
+            email: 可选的邮箱地址
+        Returns:
+            新创建的用户ID
+        """
+        try:
+            # 密码加密
+            password_hash = self._hash_password(password)
+            
+            with sqlite3.connect(self.db_path, timeout=20) as conn:
+                try:
+                    cursor = conn.execute(
+                        'INSERT INTO users (username, password_hash, email) VALUES (?, ?, ?)',
+                        (username, password_hash, email)
+                    )
+                    user_id = cursor.lastrowid
+                    logger.info(f"成功注册用户: {username}")
+                    return user_id
+                except sqlite3.IntegrityError:
+                    logger.error(f"用户名或邮箱已存在: {username}")
+                    raise ValueError("用户名或邮箱已被使用")
+        except Exception as e:
+            logger.error(f"用户注册失败: {str(e)}")
+            raise
+    
+    def verify_user(self, username, password):
+        """验证用户登录
+        Args:
+            username: 用户名
+            password: 密码
+        Returns:
+            用户信息字典或None
+        """
+        try:
+            with sqlite3.connect(self.db_path, timeout=20) as conn:
+                user = conn.execute(
+                    'SELECT id, username, password_hash, email FROM users WHERE username = ? AND is_active = 1',
+                    (username,)
+                ).fetchone()
+                
+                if user and self._verify_password(password, user[2]):
+                    # 更新最后登录时间
+                    conn.execute(
+                        'UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = ?',
+                        (user[0],)
+                    )
+                    logger.info(f"用户登录成功: {username}")
+                    return {
+                        'id': user[0],
+                        'username': user[1],
+                        'email': user[3]
+                    }
+                logger.warning(f"用户登录失败: {username}")
+                return None
+        except Exception as e:
+            logger.error(f"用户验证失败: {str(e)}")
+            raise
+    
+    def get_user_info(self, user_id):
+        """获取用户信息
+        Args:
+            user_id: 用户ID
+        Returns:
+            用户信息字典
+        """
+        try:
+            with sqlite3.connect(self.db_path, timeout=20) as conn:
+                user = conn.execute(
+                    'SELECT id, username, email, created_at, last_login FROM users WHERE id = ? AND is_active = 1',
+                    (user_id,)
+                ).fetchone()
+                
+                if user:
+                    return {
+                        'id': user[0],
+                        'username': user[1],
+                        'email': user[2],
+                        'created_at': user[3],
+                        'last_login': user[4]
+                    }
+                return None
+        except Exception as e:
+            logger.error(f"获取用户信息失败: {str(e)}")
+            raise
+    
+    def _hash_password(self, password):
+        """对密码进行加密"""
+        import hashlib
+        import uuid
+        salt = uuid.uuid4().hex
+        return hashlib.sha256(salt.encode() + password.encode()).hexdigest() + ':' + salt
+    
+    def _verify_password(self, password, hashed_password):
+        """验证密码"""
+        import hashlib
+        password_hash, salt = hashed_password.split(':')
+        return password_hash == hashlib.sha256(salt.encode() + password.encode()).hexdigest()
+    
     def get_statistics(self):
         """获取统计信息"""
         try:
@@ -351,15 +470,15 @@ class DBManager:
                 # 获取单图检测置信度
                 single_confidences = conn.execute('SELECT confidence FROM detection_history').fetchall()
                 confidence_values.extend([row[0] for row in single_confidences if row[0] is not None and 0 <= row[0] <= 1])
-                print(single_confidences)
+                
                 # 获取批量检测置信度
                 batch_confidences = conn.execute('SELECT confidence FROM batch_detection_history').fetchall()
                 confidence_values.extend([row[0] for row in batch_confidences if row[0] is not None and 0 <= row[0] <= 1])
-                print(batch_confidences)
+                
                 # 获取变化检测置信度
                 change_confidences = conn.execute('SELECT confidence FROM change_detection_history').fetchall()
                 confidence_values.extend([row[0] for row in change_confidences if row[0] is not None and 0 <= row[0] <= 1])
-                print(change_confidences)
+                
                 # 计算平均置信度
                 avg_confidence = sum(confidence_values) / len(confidence_values) if len(confidence_values) > 0 else 0
                 
@@ -367,6 +486,22 @@ class DBManager:
                 if not 0 <= avg_confidence <= 1:
                     logger.warning(f'计算的平均置信度超出范围: {avg_confidence}')
                     avg_confidence = max(0, min(1, avg_confidence))
+
+                # 获取今日检测次数
+                today = datetime.now().strftime('%Y-%m-%d')
+                today_single = conn.execute(
+                    'SELECT COUNT(*) FROM detection_history WHERE date(detection_time) = ?', 
+                    (today,)
+                ).fetchone()[0]
+                today_batch = conn.execute(
+                    'SELECT COUNT(*) FROM batch_detection_history WHERE date(detection_time) = ?', 
+                    (today,)
+                ).fetchone()[0]
+                today_change = conn.execute(
+                    'SELECT COUNT(*) FROM change_detection_history WHERE date(detection_time) = ?', 
+                    (today,)
+                ).fetchone()[0]
+                today_detections = today_single + today_batch + today_change
 
                 # 获取批量检测统计
                 batch_stats = conn.execute(
@@ -383,6 +518,7 @@ class DBManager:
                 return {
                     'total_detections': total_detections,
                     'avg_confidence': avg_confidence or 0,
+                    'today_detections': today_detections,
                     'batch_stats': {
                         'total_batches': batch_stats[0],
                         'total_images': batch_stats[1] or 0,

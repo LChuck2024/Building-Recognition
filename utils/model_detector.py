@@ -110,6 +110,8 @@ class ModelDetector:
                 'height': image.height
             } for result in results[0] for box, cls, conf in zip(result.boxes.xyxy, result.boxes.cls, result.boxes.conf)
               if conf >= conf_thres]
+            # 计算平均置信度
+            avg_confidence = sum(d['confidence'] for d in detections) / len(detections) if detections else 0
             plotted_image = results[0].plot()
         
         else:

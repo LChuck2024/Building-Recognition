@@ -33,6 +33,32 @@ st.markdown("""
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         transition: all 0.3s ease;
     }
+    /* 模型分析卡片样式 */
+    .model-analysis-card {
+        background: white;
+        padding: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        height: 100%;
+        transition: all 0.3s ease;
+    }
+    .model-analysis-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    .model-analysis-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #2C3E50;
+    }
+    .advantage-list, .disadvantage-list {
+        margin: 0.5rem 0;
+        padding-left: 1.2rem;
+    }
+    .scenario-list {
+        margin-top: 0.5rem;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -47,6 +73,35 @@ st.write("同时使用多个模型进行检测并比对结果")
 model_dir = Path(__file__).parent.parent / 'model'
 model_files = list(model_dir.glob('*.pt')) + list(model_dir.glob('*.pth'))
 model_options = [f.name for f in model_files]
+
+# 侧边栏设置
+with st.sidebar:
+    st.markdown("### 检测设置")
+    # 初始化或恢复session_state中的设置
+    if 'confidence_threshold' not in st.session_state:
+        st.session_state.confidence_threshold = 0.5
+    if 'iou_threshold' not in st.session_state:
+        st.session_state.iou_threshold = 0.45
+
+    # 置信度阈值滑动条
+    confidence_threshold = st.slider(
+        "置信度阈值",
+        min_value=0.0,
+        max_value=1.0,
+        value=st.session_state.get('confidence_threshold', 0.5),
+        help="调整检测的置信度阈值，值越高要求越严格",
+        on_change=lambda: setattr(st.session_state, 'confidence_threshold', confidence_threshold)
+    )
+
+    # IOU阈值滑动条
+    iou_threshold = st.slider(
+        "IOU阈值",
+        min_value=0.0,
+        max_value=1.0,
+        value=st.session_state.get('iou_threshold', 0.45),
+        help="调整检测的IOU阈值，值越高要求越严格",
+        on_change=lambda: setattr(st.session_state, 'iou_threshold', iou_threshold)
+    )
 
 # 模型选择
 selected_models = st.multiselect(
@@ -109,7 +164,11 @@ if start_detect and uploaded_file:
                 
                 # 执行检测
                 start_time = time.time()
-                detections, plotted_image = detector.detect(image)
+                detections, plotted_image = detector.detect(
+                    image,
+                    conf_thres=confidence_threshold,
+                    iou_thres=iou_threshold
+                )
                 detect_time = time.time() - start_time
                 
                 # 显示结果
@@ -127,14 +186,14 @@ if start_detect and uploaded_file:
                     "平均置信度": round(avg_confidence, 3)
                 })
                 
-                # 显示检测信息
-                st.write(f"检测到 {len(detections)} 个建筑物")
-                st.write(f"加载时间: {round(load_time, 3)}秒")
-                st.write(f"检测时间: {round(detect_time, 3)}秒")
-                st.write(f"平均置信度: {round(avg_confidence, 3)}")
+                # # 显示检测信息
+                # st.write(f"检测到 {len(detections)} 个建筑物")
+                # st.write(f"加载时间: {round(load_time, 3)}秒")
+                # st.write(f"检测时间: {round(detect_time, 3)}秒")
+                # st.write(f"平均置信度: {round(avg_confidence, 3)}")
                 
                 # 完成所有检测后，将进度条设置为100%
-                progress_bar.progress(1.0, text='模型比对完成！')
+                progress_bar.progress(1.0, text='模型预测完成！')
                 
             except Exception as e:
                 st.error(f"模型 {model_name} 加载失败: {str(e)}")
@@ -271,11 +330,12 @@ if start_detect and uploaded_file:
         # 显示优势分析
         st.markdown("### 💪 优势分析：")
         
+        # 创建横向布局
+        cols = st.columns(len(df))
+        
         # 创建每个模型的优势分析
-        for idx, model_data in df.iterrows():
+        for idx, (col, (_, model_data)) in enumerate(zip(cols, df.iterrows())):
             model_name = model_data['模型']
-            st.markdown(f"#### {model_name}")
-            
             advantages = []
             disadvantages = []
             
@@ -302,24 +362,9 @@ if start_detect and uploaded_file:
                 advantages.append("✅ 检测置信度高，结果可靠性好")
             else:
                 disadvantages.append("❌ 检测置信度较低，可能存在误检")
-                
-            # 显示优势
-            if advantages:
-                st.markdown("**优势：**")
-                for adv in advantages:
-                    st.markdown(adv)
-                    
-            # 显示劣势
-            if disadvantages:
-                st.markdown("**劣势：**")
-                for dis in disadvantages:
-                    st.markdown(dis)
-                    
-            # 添加使用建议
-            st.markdown("**适用场景：**")
-            scenarios = []
             
-            # 根据性能特点推荐适用场景
+            # 生成适用场景
+            scenarios = []
             if model_data['检测时间(秒)'] <= df['检测时间(秒)'].mean():
                 scenarios.append("• 实时检测场景")
             if model_data['平均置信度'] >= df['平均置信度'].mean():
@@ -328,11 +373,33 @@ if start_detect and uploaded_file:
                 scenarios.append("• 密集建筑区域")
             if model_data['加载时间(秒)'] <= df['加载时间(秒)'].mean():
                 scenarios.append("• 快速启动场景")
-                
-            for scenario in scenarios:
-                st.markdown(scenario)
             
-            st.markdown("---")  # 添加分隔线
+            # 在列中显示模型分析卡片
+            with col:
+                st.markdown("""
+                <div class="model-analysis-card">
+                    <div class="model-analysis-title">{}</div>
+                    <div class="advantage-list">
+                        <strong>优势：</strong><br>
+                        {}
+                    </div>
+                    <div class="disadvantage-list">
+                        <strong>劣势：</strong><br>
+                        {}
+                    </div>
+                    <div class="scenario-list">
+                        <strong>适用场景：</strong><br>
+                        {}
+                    </div>
+                </div>
+                """.format(
+                    model_name,
+                    '<br>'.join(advantages) if advantages else '无',
+                    '<br>'.join(disadvantages) if disadvantages else '无',
+                    '<br>'.join(scenarios) if scenarios else '无'
+                ), unsafe_allow_html=True)
+        
+        st.markdown("---")  # 添加分隔线
         
         # # 显示详细得分
         # st.markdown("#### 📊 各模型得分排名：")

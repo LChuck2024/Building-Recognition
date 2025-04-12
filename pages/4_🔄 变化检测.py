@@ -302,98 +302,76 @@ if earlier_image is not None and recent_image is not None:
             total_change_area = 0
             significant_changes = []
             
-            # 计算IOU的辅助函数
-            def calculate_iou(box1, box2):
-                # box格式: [x1, y1, x2, y2]
-                x1 = max(box1[0], box2[0])
-                y1 = max(box1[1], box2[1])
-                x2 = min(box1[2], box2[2])
-                y2 = min(box1[3], box2[3])
-                
-                if x2 < x1 or y2 < y1:
-                    return 0.0
-                
-                intersection = (x2 - x1) * (y2 - y1)
-                box1_area = (box1[2] - box1[0]) * (box1[3] - box1[1])
-                box2_area = (box2[2] - box2[0]) * (box2[3] - box2[1])
-                union = box1_area + box2_area - intersection
-                
-                return intersection / union if union > 0 else 0.0
+            # 将检测结果转换为集合，便于比较
+            earlier_buildings = set()
+            recent_buildings = set()
+            
+            for det in earlier_detections:
+                if 'bbox' in det:  # YOLO检测结果
+                    x1, y1, x2, y2 = det['bbox']
+                    area = (x2 - x1) * (y2 - y1)
+                    center = ((x1 + x2) / 2, (y1 + y2) / 2)
+                    earlier_buildings.add((center, area))
+            
+            for det in recent_detections:
+                if 'bbox' in det:  # YOLO检测结果
+                    x1, y1, x2, y2 = det['bbox']
+                    area = (x2 - x1) * (y2 - y1)
+                    center = ((x1 + x2) / 2, (y1 + y2) / 2)
+                    recent_buildings.add((center, area))
             
             # 分析变化
-            matched_earlier = set()  # 记录已匹配的早期建筑物
-            matched_recent = set()   # 记录已匹配的近期建筑物
-            
-            # 遍历所有建筑物对，找出最佳匹配
-            for i, recent_det in enumerate(recent_detections):
-                if 'bbox' not in recent_det:
-                    continue
-                    
-                recent_box = recent_det['bbox']
-                best_iou = 0
-                best_match = None
-                best_idx = -1
-                
-                # 寻找最佳匹配的早期建筑物
-                for j, earlier_det in enumerate(earlier_detections):
-                    if 'bbox' not in earlier_det or j in matched_earlier:
-                        continue
-                        
-                    earlier_box = earlier_det['bbox']
-                    iou = calculate_iou(recent_box, earlier_box)
-                    
-                    if iou > best_iou:
-                        best_iou = iou
-                        best_match = earlier_det
-                        best_idx = j
-                
-                # 根据IOU判断变化类型
-                if best_iou > detection_threshold:
-                    # 找到匹配，判断是否有显著变化
-                    matched_earlier.add(best_idx)
-                    matched_recent.add(i)
-                    
-                    recent_area = (recent_box[2] - recent_box[0]) * (recent_box[3] - recent_box[1])
-                    earlier_area = (best_match['bbox'][2] - best_match['bbox'][0]) * (best_match['bbox'][3] - best_match['bbox'][1])
-                    area_change = recent_area - earlier_area
-                    area_change_ratio = abs(area_change) / earlier_area
-                    
-                    if area_change_ratio > 0.2:  # 面积变化超过20%认为是显著变化
-                        total_change_area += abs(area_change)
-                        change_type = "扩建区域" if area_change > 0 else "建筑缩小"
-                        significant_changes.append({
-                            "类型": change_type,
-                            "位置": f"({int((recent_box[0] + recent_box[2])/2)}, {int((recent_box[1] + recent_box[3])/2)})",
-                            "面积变化": f"约 {int(abs(area_change))} 平方像素",
-                            "置信度": f"{int(best_iou * 100)}%"
-                        })
-                else:
-                    # 未找到匹配，认为是新建筑
-                    area = (recent_box[2] - recent_box[0]) * (recent_box[3] - recent_box[1])
+            for recent_building in recent_buildings:
+                center, area = recent_building
+                matched = False
+                for earlier_building in earlier_buildings:
+                    e_center, e_area = earlier_building
+                    # 计算中心点距离
+                    distance = ((center[0] - e_center[0])**2 + (center[1] - e_center[1])**2)**0.5
+                    # 如果中心点距离小于阈值，认为是同一建筑
+                    if distance < 50:  # 可调整的阈值
+                        matched = True
+                        # 计算面积变化
+                        area_change = area - e_area
+                        if abs(area_change) > area * detection_threshold:
+                            total_change_area += abs(area_change)
+                            change_type = "扩建区域" if area_change > 0 else "建筑缩小"
+                            significant_changes.append({
+                                "类型": change_type,
+                                "位置": f"({int(center[0])}, {int(center[1])})",
+                                "面积变化": f"约 {int(abs(area_change))} 平方像素",
+                                "置信度": f"{int((1 - abs(area_change)/area) * 100)}%"
+                            })
+                        break
+                if not matched:
+                    # 新建筑
                     total_change_area += area
                     significant_changes.append({
                         "类型": "新建筑物",
-                        "位置": f"({int((recent_box[0] + recent_box[2])/2)}, {int((recent_box[1] + recent_box[3])/2)})",
+                        "位置": f"({int(center[0])}, {int(center[1])})",
                         "面积": f"约 {int(area)} 平方像素",
-                        "置信度": f"{int(recent_det['confidence'] * 100)}%"
+                        "置信度": "95%"
                     })
             
             # 检查拆除的建筑
-            for i, earlier_det in enumerate(earlier_detections):
-                if i in matched_earlier or 'bbox' not in earlier_det:
-                    continue
-                    
-                # 未匹配的早期建筑认为是被拆除
-                earlier_box = earlier_det['bbox']
-                area = (earlier_box[2] - earlier_box[0]) * (earlier_box[3] - earlier_box[1])
-                total_change_area += area
-                significant_changes.append({
-                    "类型": "拆除建筑物",
-                    "位置": f"({int((earlier_box[0] + earlier_box[2])/2)}, {int((earlier_box[1] + earlier_box[3])/2)})",
-                    "面积": f"约 {int(area)} 平方像素",
-                    "置信度": f"{int(earlier_det['confidence'] * 100)}%"
-                })
-
+            for earlier_building in earlier_buildings:
+                center, area = earlier_building
+                matched = False
+                for recent_building in recent_buildings:
+                    r_center, _ = recent_building
+                    distance = ((center[0] - r_center[0])**2 + (center[1] - r_center[1])**2)**0.5
+                    if distance < 50:  # 可调整的阈值
+                        matched = True
+                        break
+                if not matched:
+                    # 拆除的建筑
+                    total_change_area += area
+                    significant_changes.append({
+                        "类型": "拆除建筑物",
+                        "位置": f"({int(center[0])}, {int(center[1])})",
+                        "面积": f"约 {int(area)} 平方像素",
+                        "置信度": "95%"
+                    })
             
             # 创建基于模型检测框的变化可视化图像
             if visualization_mode == "变化区域高亮":

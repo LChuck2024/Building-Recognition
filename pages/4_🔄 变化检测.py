@@ -398,30 +398,33 @@ if earlier_image is not None and recent_image is not None:
                     area_change = recent_building['area'] - earlier_buildings[best_match]['area']
                     area_change_ratio = abs(area_change) / earlier_buildings[best_match]['area']
                     
-                    if detect_extensions and area_change_ratio > area_change_threshold and area_change > 0:
-                        # 检测到扩建
+                    if detect_extensions and area_change_ratio > area_change_threshold:
+                        # 检测到扩建或缩小
                         matched_recent[i] = True
                         matched_earlier[best_match] = True
                         total_change_area += abs(area_change)
                         changes_count["建筑物扩建"] += 1
+                        change_type = "建筑物扩建" if area_change > 0 else "建筑物缩小"
                         significant_changes.append({
-                            "类型": "建筑物扩建",
-                            "面积变化": f"从 {int(earlier_buildings[best_match]['area'])} 增加到 {int(recent_building['area'])} 平方像素",
+                            "类型": change_type,
+                            "位置": f"坐标({int(recent_building['center'][0])}, {int(recent_building['center'][1])})",
+                            "面积变化": f"从 {int(earlier_buildings[best_match]['area'])} 变化到 {int(recent_building['area'])} 平方像素",
                             "变化比例": f"{int(area_change_ratio * 100)}%"
                         })
                     else:
                         # 如果面积变化不大，标记为匹配
                         matched_recent[i] = True
                         matched_earlier[best_match] = True
-                else:
-                    # 如果没有匹配到或IOU低于阈值，可能是新建筑
-                    if detect_new_buildings:
-                        total_change_area += recent_building['area']
-                        changes_count["新建筑物"] += 1
-                        significant_changes.append({
-                            "类型": "新建筑物",
-                            "面积": f"约 {int(recent_building['area'])} 平方像素"
-                        })
+                elif detect_new_buildings and not matched_recent[i]:
+                    # 如果没有匹配到或IOU低于阈值，且启用了新建筑检测
+                    total_change_area += recent_building['area']
+                    changes_count["新建筑物"] += 1
+                    significant_changes.append({
+                        "类型": "新建筑物",
+                        "位置": f"坐标({int(recent_building['center'][0])}, {int(recent_building['center'][1])})",
+                        "面积": f"约 {int(recent_building['area'])} 平方像素",
+                        "置信度": f"{recent_building['confidence']:.2f}"
+                    })
             
             # 第二步：处理拆除的建筑物
             if detect_demolished:
@@ -431,7 +434,9 @@ if earlier_image is not None and recent_image is not None:
                         changes_count["拆除建筑物"] += 1
                         significant_changes.append({
                             "类型": "拆除建筑物",
-                            "面积": f"约 {int(earlier_building['area'])} 平方像素"
+                            "位置": f"坐标({int(earlier_building['center'][0])}, {int(earlier_building['center'][1])})",
+                            "面积": f"约 {int(earlier_building['area'])} 平方像素",
+                            "置信度": f"{earlier_building['confidence']:.2f}"
                         })
 
             
@@ -531,6 +536,7 @@ if earlier_image is not None and recent_image is not None:
                     confidence = (earlier_confidence + recent_confidence) / 2,
                     detection_result={
                         'changes_detected': changes_detected,
+                        'significant_changes': significant_changes,
                         'visualization_mode': visualization_mode
                     }
                 )

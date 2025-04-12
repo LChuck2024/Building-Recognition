@@ -371,7 +371,7 @@ if earlier_image is not None and recent_image is not None:
             matched_earlier = [False] * len(earlier_buildings)
             matched_recent = [False] * len(recent_buildings)
             
-           # 初始化变化类型计数
+            # 初始化变化类型计数
             changes_count = {
                 "新建筑物": 0,
                 "拆除建筑物": 0,
@@ -397,11 +397,6 @@ if earlier_image is not None and recent_image is not None:
                     area_change = recent_building['area'] - earlier_buildings[best_match]['area']
                     area_change_ratio = abs(area_change) / earlier_buildings[best_match]['area']
                     
-                    # 计算位置变化
-                    dx = recent_building['center'][0] - earlier_buildings[best_match]['center'][0]
-                    dy = recent_building['center'][1] - earlier_buildings[best_match]['center'][1]
-                    position_change = np.sqrt(dx*dx + dy*dy)
-                    
                     # 判断是否为扩建
                     if area_change_ratio > area_change_threshold and area_change > 0:
                         matched_recent[i] = True
@@ -410,12 +405,8 @@ if earlier_image is not None and recent_image is not None:
                         changes_count["建筑物扩建"] += 1
                         significant_changes.append({
                             "类型": "建筑物扩建",
-                            "位置": f"({int(recent_building['center'][0])}, {int(recent_building['center'][1])})",
-                            "原始面积": f"约 {int(earlier_buildings[best_match]['area'])} 平方像素",
-                            "扩建后面积": f"约 {int(recent_building['area'])} 平方像素",
-                            "扩建面积": f"约 {int(abs(area_change))} 平方像素",
-                            "扩建比例": f"{int(area_change_ratio * 100)}%",
-                            "置信度": f"{int(recent_building['confidence'] * 100)}%"
+                            "面积变化": f"从 {int(earlier_buildings[best_match]['area'])} 增加到 {int(recent_building['area'])} 平方像素",
+                            "变化比例": f"{int(area_change_ratio * 100)}%"
                         })
                     else:
                         # 如果不是扩建，标记为匹配但不记录变化
@@ -431,9 +422,7 @@ if earlier_image is not None and recent_image is not None:
                     changes_count["拆除建筑物"] += 1
                     significant_changes.append({
                         "类型": "拆除建筑物",
-                        "位置": f"({int(earlier_building['center'][0])}, {int(earlier_building['center'][1])})",
-                        "面积": f"约 {int(earlier_building['area'])} 平方像素",
-                        "置信度": f"{int(earlier_building['confidence'] * 100)}%"
+                        "面积": f"约 {int(earlier_building['area'])} 平方像素"
                     })
             
             # 再处理新建的建筑物
@@ -444,9 +433,7 @@ if earlier_image is not None and recent_image is not None:
                     changes_count["新建筑物"] += 1
                     significant_changes.append({
                         "类型": "新建筑物",
-                        "位置": f"({int(recent_building['center'][0])}, {int(recent_building['center'][1])})",
-                        "面积": f"约 {int(recent_building['area'])} 平方像素",
-                        "置信度": f"{int(recent_building['confidence'] * 100)}%"
+                        "面积": f"约 {int(recent_building['area'])} 平方像素"
                     })
             
             # 创建基于模型检测框的变化可视化图像

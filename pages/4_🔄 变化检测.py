@@ -371,15 +371,20 @@ if earlier_image is not None and recent_image is not None:
             matched_earlier = [False] * len(earlier_buildings)
             matched_recent = [False] * len(recent_buildings)
             
-            # 初始化变化类型计数
+            # 初始化变化类型计数和变化列表
             changes_count = {
                 "新建筑物": 0,
                 "拆除建筑物": 0,
                 "建筑物扩建": 0
             }
+            significant_changes = []
+            total_change_area = 0
             
-            # 检查每个近期建筑物
+            # 第一步：匹配建筑物并检测扩建
             for i, recent_building in enumerate(recent_buildings):
+                if not detect_extensions:  # 如果不检测扩建，跳过匹配过程
+                    continue
+                    
                 best_iou = 0
                 best_match = -1
                 
@@ -391,13 +396,11 @@ if earlier_image is not None and recent_image is not None:
                             best_iou = iou
                             best_match = j
                 
-                # 根据IOU值判断变化类型
+                # 判断扩建情况
                 if best_iou > iou_threshold and best_match != -1:
-                    # 计算面积变化
                     area_change = recent_building['area'] - earlier_buildings[best_match]['area']
                     area_change_ratio = abs(area_change) / earlier_buildings[best_match]['area']
                     
-                    # 判断是否为扩建
                     if area_change_ratio > area_change_threshold and area_change > 0:
                         matched_recent[i] = True
                         matched_earlier[best_match] = True
@@ -409,32 +412,32 @@ if earlier_image is not None and recent_image is not None:
                             "变化比例": f"{int(area_change_ratio * 100)}%"
                         })
                     else:
-                        # 如果不是扩建，标记为匹配但不记录变化
+                        # 如果面积变化不大，标记为匹配
                         matched_recent[i] = True
                         matched_earlier[best_match] = True
             
-            # 处理未匹配的建筑物（新建和拆除）
-            # 先处理拆除的建筑物
-            for i, earlier_building in enumerate(earlier_buildings):
-                if not matched_earlier[i]:
-                    # 拆除的建筑
-                    total_change_area += earlier_building['area']
-                    changes_count["拆除建筑物"] += 1
-                    significant_changes.append({
-                        "类型": "拆除建筑物",
-                        "面积": f"约 {int(earlier_building['area'])} 平方像素"
-                    })
+            # 第二步：处理拆除的建筑物
+            if detect_demolished:
+                for i, earlier_building in enumerate(earlier_buildings):
+                    if not matched_earlier[i]:
+                        total_change_area += earlier_building['area']
+                        changes_count["拆除建筑物"] += 1
+                        significant_changes.append({
+                            "类型": "拆除建筑物",
+                            "面积": f"约 {int(earlier_building['area'])} 平方像素"
+                        })
             
-            # 再处理新建的建筑物
-            for i, recent_building in enumerate(recent_buildings):
-                if not matched_recent[i]:
-                    # 新建筑
-                    total_change_area += recent_building['area']
-                    changes_count["新建筑物"] += 1
-                    significant_changes.append({
-                        "类型": "新建筑物",
-                        "面积": f"约 {int(recent_building['area'])} 平方像素"
-                    })
+            # 第三步：处理新建的建筑物
+            if detect_new_buildings:
+                for i, recent_building in enumerate(recent_buildings):
+                    if not matched_recent[i]:
+                        total_change_area += recent_building['area']
+                        changes_count["新建筑物"] += 1
+                        significant_changes.append({
+                            "类型": "新建筑物",
+                            "面积": f"约 {int(recent_building['area'])} 平方像素"
+                        })
+
             
             # 创建基于模型检测框的变化可视化图像
             if visualization_mode == "变化区域高亮":

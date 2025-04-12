@@ -571,44 +571,44 @@ if earlier_image is not None and recent_image is not None:
                 st.image(Image.fromarray(change_viz), caption="变化检测结果", use_container_width=True)
             
             # 显示详细变化列表
-            st.markdown("#### 详细变化列表")
+            # st.markdown("#### 详细变化列表")
             
-            # 从实际检测结果生成变化详情数据
-            changes_data = []
-            try:
-                # 获取变化区域的轮廓
-                earlier_gray = cv2.cvtColor(np.array(earlier_img), cv2.COLOR_BGR2GRAY)
-                recent_gray = cv2.cvtColor(np.array(recent_img), cv2.COLOR_BGR2GRAY)
-                diff = cv2.absdiff(earlier_gray, recent_gray)
-                _, thresh = cv2.threshold(diff, 30, 255, cv2.THRESH_BINARY)
-                contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-                for contour in contours:
-                    area = cv2.contourArea(contour)
-                    if area > 100:  # 过滤小区域
-                        x, y, w, h = cv2.boundingRect(contour)
-                        earlier_region = earlier_gray[y:y+h, x:x+w]
-                        recent_region = recent_gray[y:y+h, x:x+w]
-                        intensity_diff = np.mean(recent_region) - np.mean(earlier_region)
+            # # 从实际检测结果生成变化详情数据
+            # changes_data = []
+            # try:
+            #     # 获取变化区域的轮廓
+            #     earlier_gray = cv2.cvtColor(np.array(earlier_img), cv2.COLOR_BGR2GRAY)
+            #     recent_gray = cv2.cvtColor(np.array(recent_img), cv2.COLOR_BGR2GRAY)
+            #     diff = cv2.absdiff(earlier_gray, recent_gray)
+            #     _, thresh = cv2.threshold(diff, 30, 255, cv2.THRESH_BINARY)
+            #     contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            #     for contour in contours:
+            #         area = cv2.contourArea(contour)
+            #         if area > 100:  # 过滤小区域
+            #             x, y, w, h = cv2.boundingRect(contour)
+            #             earlier_region = earlier_gray[y:y+h, x:x+w]
+            #             recent_region = recent_gray[y:y+h, x:x+w]
+            #             intensity_diff = np.mean(recent_region) - np.mean(earlier_region)
                         
-                        # 根据实际检测结果确定变化类型
-                        change_type = "扩建区域"
-                        if intensity_diff > 50:
-                            change_type = "新建筑物"
-                        elif intensity_diff < -50:
-                            change_type = "拆除建筑物"
+            #             # 根据实际检测结果确定变化类型
+            #             change_type = "扩建区域"
+            #             if intensity_diff > 50:
+            #                 change_type = "新建筑物"
+            #             elif intensity_diff < -50:
+            #                 change_type = "拆除建筑物"
                         
-                        # 计算置信度
-                        confidence = int((1 - abs(intensity_diff)/255) * 100)
+            #             # 计算置信度
+            #             confidence = int((1 - abs(intensity_diff)/255) * 100)
                         
-                        changes_data.append({
-                            "类型": change_type,
-                            "位置": f"({x}, {y})",
-                            "面积": f"约 {int(area)} 平方像素",
-                            "置信度": f"{confidence}%"
-                        })
-            except Exception as e:
-                st.error(f"处理变化详情时发生错误: {str(e)}")
-                changes_data = []  # 发生错误时使用空列表
+            #             changes_data.append({
+            #                 "类型": change_type,
+            #                 "位置": f"({x}, {y})",
+            #                 "面积": f"约 {int(area)} 平方像素",
+            #                 "置信度": f"{confidence}%"
+            #             })
+            # except Exception as e:
+            #     st.error(f"处理变化详情时发生错误: {str(e)}")
+            #     changes_data = []  # 发生错误时使用空列表
             
             # 创建DataFrame并显示
             changes_df = pd.DataFrame(changes_data)

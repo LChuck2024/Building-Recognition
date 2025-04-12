@@ -531,7 +531,6 @@ if earlier_image is not None and recent_image is not None:
                     confidence = (earlier_confidence + recent_confidence) / 2,
                     detection_result={
                         'changes_detected': changes_detected,
-                        'significant_changes': significant_changes,
                         'visualization_mode': visualization_mode
                     }
                 )

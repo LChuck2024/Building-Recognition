@@ -395,22 +395,22 @@ if earlier_image is not None and recent_image is not None:
                     dy = recent_building['center'][1] - earlier_buildings[best_match]['center'][1]
                     position_change = np.sqrt(dx*dx + dy*dy)
                     
-                    # 判断是否为扩建或缩小
-                    if area_change_ratio > area_change_threshold:
+                    # 判断是否为扩建
+                    if area_change_ratio > area_change_threshold and area_change > 0:
                         matched_recent[i] = True
                         matched_earlier[best_match] = True
                         total_change_area += abs(area_change)
-                        change_type = "扩建区域" if area_change > 0 else "建筑缩小"
                         significant_changes.append({
-                            "类型": change_type,
+                            "类型": "建筑物扩建",
                             "位置": f"({int(recent_building['center'][0])}, {int(recent_building['center'][1])})",
-                            "面积变化": f"约 {int(abs(area_change))} 平方像素",
-                            "变化比例": f"{int(area_change_ratio * 100)}%",
-                            "位置偏移": f"{int(position_change)} 像素",
+                            "原始面积": f"约 {int(earlier_buildings[best_match]['area'])} 平方像素",
+                            "扩建后面积": f"约 {int(recent_building['area'])} 平方像素",
+                            "扩建面积": f"约 {int(abs(area_change))} 平方像素",
+                            "扩建比例": f"{int(area_change_ratio * 100)}%",
                             "置信度": f"{int(recent_building['confidence'] * 100)}%"
                         })
                     else:
-                        # 如果面积变化不大，标记为匹配但不记录变化
+                        # 如果不是扩建，标记为匹配但不记录变化
                         matched_recent[i] = True
                         matched_earlier[best_match] = True
             

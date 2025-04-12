@@ -371,6 +371,13 @@ if earlier_image is not None and recent_image is not None:
             matched_earlier = [False] * len(earlier_buildings)
             matched_recent = [False] * len(recent_buildings)
             
+           # 初始化变化类型计数
+            changes_count = {
+                "新建筑物": 0,
+                "拆除建筑物": 0,
+                "建筑物扩建": 0
+            }
+            
             # 检查每个近期建筑物
             for i, recent_building in enumerate(recent_buildings):
                 best_iou = 0
@@ -400,6 +407,7 @@ if earlier_image is not None and recent_image is not None:
                         matched_recent[i] = True
                         matched_earlier[best_match] = True
                         total_change_area += abs(area_change)
+                        changes_count["建筑物扩建"] += 1
                         significant_changes.append({
                             "类型": "建筑物扩建",
                             "位置": f"({int(recent_building['center'][0])}, {int(recent_building['center'][1])})",
@@ -420,6 +428,7 @@ if earlier_image is not None and recent_image is not None:
                 if not matched_earlier[i]:
                     # 拆除的建筑
                     total_change_area += earlier_building['area']
+                    changes_count["拆除建筑物"] += 1
                     significant_changes.append({
                         "类型": "拆除建筑物",
                         "位置": f"({int(earlier_building['center'][0])}, {int(earlier_building['center'][1])})",
@@ -432,6 +441,7 @@ if earlier_image is not None and recent_image is not None:
                 if not matched_recent[i]:
                     # 新建筑
                     total_change_area += recent_building['area']
+                    changes_count["新建筑物"] += 1
                     significant_changes.append({
                         "类型": "新建筑物",
                         "位置": f"({int(recent_building['center'][0])}, {int(recent_building['center'][1])})",
@@ -485,9 +495,9 @@ if earlier_image is not None and recent_image is not None:
             
             # 统计检测结果
             changes_detected = {
-                "新建筑物": len([c for c in significant_changes if c["类型"] == "新建筑物"]),
-                "拆除建筑物": len([c for c in significant_changes if c["类型"] == "拆除建筑物"]),
-                "扩建区域": len([c for c in significant_changes if c["类型"] == "扩建区域"]),
+                "新建筑物": changes_count["新建筑物"],
+                "拆除建筑物": changes_count["拆除建筑物"],
+                "扩建区域": changes_count["建筑物扩建"],
                 "总变化面积": f"约 {int(total_change_area)} 平方像素",
                 "变化率": f"{min(100.0, (total_change_area / (target_size[0] * target_size[1]) * 100)):.1f}%"
             }

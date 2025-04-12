@@ -1,7 +1,7 @@
 streamlit
 torch
 torchvision
-ultralytics
+ultralytics>=8.3.92
 opencv-python-headless
 numpy
 Pillow
@@ -10,3 +10,4 @@ plotly
 scikit-image
 openpyxl>=3.0.0
 segmentation_models_pytorch>=0.4.0
+dill>=0.3.6

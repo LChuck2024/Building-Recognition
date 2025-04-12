@@ -2085,3 +2085,45 @@
 2025-04-10 23:57:15,745 - INFO - 数据库初始化成功
 2025-04-10 23:57:15,829 - INFO - 开始获取单图检测历史记录
 2025-04-10 23:57:15,830 - INFO - 成功获取1条单图检测历史记录
+2025-04-11 14:08:57,991 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-比赛实战/Building-Recognition/data/history.db
+2025-04-11 14:08:57,999 - INFO - 数据库初始化成功
+2025-04-11 14:09:53,852 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-比赛实战/Building-Recognition/data/history.db
+2025-04-11 14:09:53,859 - INFO - 数据库初始化成功
+2025-04-11 14:09:53,865 - INFO - 开始添加单图检测记录，图片路径: data/detection_results/1744351793_3MVOOO2GK0.jpg
+2025-04-11 14:09:53,866 - INFO - 成功添加单图检测记录，建筑类型: building, 置信度: 0.8543300628662109
+2025-04-11 14:10:09,190 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-比赛实战/Building-Recognition/data/history.db
+2025-04-11 14:10:09,193 - INFO - 数据库初始化成功
+2025-04-11 14:10:09,200 - INFO - 开始添加单图检测记录，图片路径: data/detection_results/1744351809_3WNH3889ZP.jpg
+2025-04-11 14:10:09,202 - INFO - 成功添加单图检测记录，建筑类型: building, 置信度: 0.9262288212776184
+2025-04-11 14:11:08,746 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-比赛实战/Building-Recognition/data/history.db
+2025-04-11 14:11:08,748 - INFO - 数据库初始化成功
+2025-04-11 14:11:08,754 - INFO - 开始添加模型比对记录，图片路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-比赛实战/Building-Recognition/temp/comparison_1744351868.jpg
+2025-04-11 14:11:08,754 - INFO - 成功添加模型比对记录，模型: build-12s.pt,build_V8n.pt,yolo11n.pt,build-YOLO12s.pt
+2025-04-11 14:11:41,540 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-比赛实战/Building-Recognition/data/history.db
+2025-04-11 14:11:41,548 - INFO - 数据库初始化成功
+2025-04-11 14:11:41,554 - INFO - 开始添加模型比对记录，图片路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-比赛实战/Building-Recognition/temp/comparison_1744351901.jpg
+2025-04-11 14:11:41,555 - INFO - 成功添加模型比对记录，模型: build-12s.pt,build_V8n.pt,build-YOLO12s.pt
+2025-04-11 14:11:53,956 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-比赛实战/Building-Recognition/data/history.db
+2025-04-11 14:11:53,959 - INFO - 数据库初始化成功
+2025-04-11 14:11:53,964 - INFO - 开始添加模型比对记录，图片路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-比赛实战/Building-Recognition/temp/comparison_1744351913.jpg
+2025-04-11 14:11:53,965 - INFO - 成功添加模型比对记录，模型: build-12s.pt,build_V8n.pt,build-YOLO12s.pt
+2025-04-11 14:12:11,316 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-比赛实战/Building-Recognition/data/history.db
+2025-04-11 14:12:11,324 - INFO - 数据库初始化成功
+2025-04-11 14:12:11,343 - INFO - 开始添加模型比对记录，图片路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-比赛实战/Building-Recognition/temp/comparison_1744351931.jpg
+2025-04-11 14:12:11,346 - INFO - 成功添加模型比对记录，模型: build-12s.pt,build_V8n.pt,build-YOLO12s.pt
+2025-04-11 14:12:38,175 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-比赛实战/Building-Recognition/data/history.db
+2025-04-11 14:12:38,179 - INFO - 数据库初始化成功
+2025-04-11 14:12:38,184 - INFO - 开始添加模型比对记录，图片路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-比赛实战/Building-Recognition/temp/comparison_1744351958.jpg
+2025-04-11 14:12:38,185 - INFO - 成功添加模型比对记录，模型: build-12s.pt,build_V8n.pt,build-YOLO12s.pt
+2025-04-11 14:12:46,443 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-比赛实战/Building-Recognition/data/history.db
+2025-04-11 14:12:46,446 - INFO - 数据库初始化成功
+2025-04-11 14:12:46,451 - INFO - 开始添加模型比对记录，图片路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-比赛实战/Building-Recognition/temp/comparison_1744351966.jpg
+2025-04-11 14:12:46,451 - INFO - 成功添加模型比对记录，模型: build-12s.pt,build_V8n.pt,build-YOLO12s.pt
+2025-04-11 14:29:34,094 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-比赛实战/Building-Recognition/data/history.db
+2025-04-11 14:29:34,101 - INFO - 数据库初始化成功
+2025-04-11 14:29:34,108 - INFO - 开始添加模型比对记录，图片路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-比赛实战/Building-Recognition/temp/comparison_1744352974.jpg
+2025-04-11 14:29:34,109 - INFO - 成功添加模型比对记录，模型: build-12s.pt,build_V8n.pt,build-YOLO12s.pt
+2025-04-11 14:29:45,521 - INFO - 初始化数据库，路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-比赛实战/Building-Recognition/data/history.db
+2025-04-11 14:29:45,524 - INFO - 数据库初始化成功
+2025-04-11 14:29:45,529 - INFO - 开始添加模型比对记录，图片路径: /Users/chuck.li/Documents/02-技术学习/04 -- 课程学习notebook/00-比赛实战/Building-Recognition/temp/comparison_1744352985.jpg
+2025-04-11 14:29:45,530 - INFO - 成功添加模型比对记录，模型: build-12s.pt,build_V8n.pt,build-YOLO12s.pt,yolo11n.pt

@@ -399,10 +399,18 @@ if earlier_image is not None and recent_image is not None:
                 heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
                 change_viz = cv2.addWeighted(change_viz, 0.7, heatmap, 0.3, 0)
             
-            # 获取图片尺寸
+            # 获取图片尺寸并统一化
             earlier_img = Image.open(earlier_image)
             recent_img = Image.open(recent_image)
-            target_size = earlier_img.size
+            
+            # 统一图片尺寸为较大的那个尺寸
+            target_size = (max(earlier_img.size[0], recent_img.size[0]), max(earlier_img.size[1], recent_img.size[1]))
+            earlier_img = earlier_img.resize(target_size, Image.Resampling.LANCZOS)
+            recent_img = recent_img.resize(target_size, Image.Resampling.LANCZOS)
+            
+            # 转换为numpy数组以便进行OpenCV操作
+            earlier_array = np.array(earlier_img)
+            recent_array = np.array(recent_img)
             
             # 计算平均变化强度
             intensity_diff = 0

@@ -611,29 +611,29 @@ if earlier_image is not None and recent_image is not None:
             #     changes_data = []  # 发生错误时使用空列表
             
             # 创建DataFrame并显示
-            changes_df = pd.DataFrame(changes_data)
-            st.dataframe(changes_df, use_container_width=True)
+            # changes_df = pd.DataFrame(changes_data)
+            # st.dataframe(changes_df, use_container_width=True)
             
             # 提供导出选项
-            st.markdown("#### 导出结果")
-            export_col1, export_col2 = st.columns(2)
+            # st.markdown("#### 导出结果")
+            # export_col1, export_col2 = st.columns(2)
             
-            with export_col1:
-                st.download_button(
-                    label="📊 导出变化数据 (CSV)",
-                    data=changes_df.to_csv(index=False).encode('utf-8'),
-                    file_name="building_changes.csv",
-                    mime="text/csv"
-                )
+            # with export_col1:
+            #     st.download_button(
+            #         label="📊 导出变化数据 (CSV)",
+            #         data=changes_df.to_csv(index=False).encode('utf-8'),
+            #         file_name="building_changes.csv",
+            #         mime="text/csv"
+            #     )
             
-            with export_col2:
-                # 在实际应用中，这里应该生成一个包含所有结果的PDF报告
-                st.download_button(
-                    label="📑 导出完整报告 (PDF)",
-                    data="模拟PDF报告数据",  # 实际应用中应该是真实的PDF数据
-                    file_name="change_detection_report.pdf",
-                    mime="application/pdf"
-                )
+            # with export_col2:
+            #     # 在实际应用中，这里应该生成一个包含所有结果的PDF报告
+            #     st.download_button(
+            #         label="📑 导出完整报告 (PDF)",
+            #         data="模拟PDF报告数据",  # 实际应用中应该是真实的PDF数据
+            #         file_name="change_detection_report.pdf",
+            #         mime="application/pdf"
+            #     )
 
 # 添加页脚
 st.markdown("---")

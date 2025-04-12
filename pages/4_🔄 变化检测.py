@@ -380,21 +380,12 @@ if earlier_image is not None and recent_image is not None:
                 for j, earlier_building in enumerate(earlier_buildings):
                     if not matched_earlier[j]:
                         iou = calculate_iou(recent_building['bbox'], earlier_building['bbox'])
-                        # 计算中心点距离
-                        dx = recent_building['center'][0] - earlier_building['center'][0]
-                        dy = recent_building['center'][1] - earlier_building['center'][1]
-                        center_distance = np.sqrt(dx*dx + dy*dy)
-                        
-                        # 综合考虑IOU和中心点距离
-                        if iou > best_iou and center_distance < position_change_threshold:
+                        if iou > best_iou:
                             best_iou = iou
                             best_match = j
                 
-                # 根据IOU值和其他指标判断变化类型
-                if best_iou > iou_threshold:
-                    matched_recent[i] = True
-                    matched_earlier[best_match] = True
-                    
+                # 根据IOU值判断变化类型
+                if best_iou > iou_threshold and best_match != -1:
                     # 计算面积变化
                     area_change = recent_building['area'] - earlier_buildings[best_match]['area']
                     area_change_ratio = abs(area_change) / earlier_buildings[best_match]['area']
@@ -404,8 +395,10 @@ if earlier_image is not None and recent_image is not None:
                     dy = recent_building['center'][1] - earlier_buildings[best_match]['center'][1]
                     position_change = np.sqrt(dx*dx + dy*dy)
                     
-                    # 综合判断变化
+                    # 判断是否为扩建或缩小
                     if area_change_ratio > area_change_threshold:
+                        matched_recent[i] = True
+                        matched_earlier[best_match] = True
                         total_change_area += abs(area_change)
                         change_type = "扩建区域" if area_change > 0 else "建筑缩小"
                         significant_changes.append({
@@ -416,6 +409,10 @@ if earlier_image is not None and recent_image is not None:
                             "位置偏移": f"{int(position_change)} 像素",
                             "置信度": f"{int(recent_building['confidence'] * 100)}%"
                         })
+                    else:
+                        # 如果面积变化不大，标记为匹配但不记录变化
+                        matched_recent[i] = True
+                        matched_earlier[best_match] = True
             
             # 处理未匹配的建筑物（新建和拆除）
             for i, recent_building in enumerate(recent_buildings):

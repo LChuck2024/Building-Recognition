@@ -382,9 +382,6 @@ if earlier_image is not None and recent_image is not None:
             
             # 第一步：匹配建筑物并检测扩建
             for i, recent_building in enumerate(recent_buildings):
-                if not detect_extensions:  # 如果不检测扩建，跳过匹配过程
-                    continue
-                    
                 best_iou = 0
                 best_match = -1
                 
@@ -396,12 +393,13 @@ if earlier_image is not None and recent_image is not None:
                             best_iou = iou
                             best_match = j
                 
-                # 判断扩建情况
+                # 判断建筑物变化情况
                 if best_iou > iou_threshold and best_match != -1:
                     area_change = recent_building['area'] - earlier_buildings[best_match]['area']
                     area_change_ratio = abs(area_change) / earlier_buildings[best_match]['area']
                     
-                    if area_change_ratio > area_change_threshold and area_change > 0:
+                    if detect_extensions and area_change_ratio > area_change_threshold and area_change > 0:
+                        # 检测到扩建
                         matched_recent[i] = True
                         matched_earlier[best_match] = True
                         total_change_area += abs(area_change)
@@ -415,6 +413,15 @@ if earlier_image is not None and recent_image is not None:
                         # 如果面积变化不大，标记为匹配
                         matched_recent[i] = True
                         matched_earlier[best_match] = True
+                else:
+                    # 如果没有匹配到或IOU低于阈值，可能是新建筑
+                    if detect_new_buildings:
+                        total_change_area += recent_building['area']
+                        changes_count["新建筑物"] += 1
+                        significant_changes.append({
+                            "类型": "新建筑物",
+                            "面积": f"约 {int(recent_building['area'])} 平方像素"
+                        })
             
             # 第二步：处理拆除的建筑物
             if detect_demolished:
@@ -425,17 +432,6 @@ if earlier_image is not None and recent_image is not None:
                         significant_changes.append({
                             "类型": "拆除建筑物",
                             "面积": f"约 {int(earlier_building['area'])} 平方像素"
-                        })
-            
-            # 第三步：处理新建的建筑物
-            if detect_new_buildings:
-                for i, recent_building in enumerate(recent_buildings):
-                    if not matched_recent[i]:
-                        total_change_area += recent_building['area']
-                        changes_count["新建筑物"] += 1
-                        significant_changes.append({
-                            "类型": "新建筑物",
-                            "面积": f"约 {int(recent_building['area'])} 平方像素"
                         })
 
             

@@ -177,7 +177,7 @@ with st.sidebar:
     if 'show_label' not in st.session_state:
         st.session_state.show_label = True
     if 'model_name' not in st.session_state:
-        st.session_state.model_name = 'yolo11n.pt'
+        st.session_state.model_name = 'build_V8n.pt'
 
     # 获取model目录下的所有模型文件
     model_dir = Path(__file__).parent.parent / 'model'
@@ -186,7 +186,7 @@ with st.sidebar:
     
     if not model_files:
         st.error("未找到可用的模型文件，请确保model目录中存在.pt或.pth格式的模型文件")
-        model_files = ['yolo11n.pt']  # 设置默认值
+        model_files = ['build_V8n.pt']  # 设置默认值
     
     model_name = st.selectbox(
         "选择模型",

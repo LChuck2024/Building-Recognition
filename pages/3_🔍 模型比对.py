@@ -107,7 +107,7 @@ with st.sidebar:
 selected_models = st.multiselect(
     "选择要比较的模型",
     model_options,
-    default=["build-12s.pt", "build_V8n.pt"]
+    default=["build-YOLO12s.pt", "build_V8n.pt"]
 )
 
 if not selected_models:

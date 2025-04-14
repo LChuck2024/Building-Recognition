@@ -81,7 +81,7 @@ with st.sidebar:
     if 'confidence_threshold' not in st.session_state:
         st.session_state.confidence_threshold = 0.5
     if 'iou_threshold' not in st.session_state:
-        st.session_state.iou_threshold = 0.45
+        st.session_state.iou_threshold = 0.8
 
     # 置信度阈值滑动条
     confidence_threshold = st.slider(
@@ -98,7 +98,7 @@ with st.sidebar:
         "IOU阈值",
         min_value=0.0,
         max_value=1.0,
-        value=st.session_state.get('iou_threshold', 0.45),
+        value=st.session_state.get('iou_threshold', 0.8),
         help="调整检测的IOU阈值，值越高要求越严格",
         on_change=lambda: setattr(st.session_state, 'iou_threshold', iou_threshold)
     )

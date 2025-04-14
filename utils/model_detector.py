@@ -5,6 +5,7 @@ import cv2
 from pathlib import Path
 from ultralytics import YOLO
 from torchvision import transforms
+# import matplotlib.pyplot as plt
 
 class ModelDetector:
     def __init__(self, model_name, device=None):
@@ -23,10 +24,12 @@ class ModelDetector:
             self.model_type = 'yolo'
         elif 'unet' in model_name_lower:
             self.model_type = 'unet'
+        elif 'upp' in model_name_lower:
+            self.model_type = 'upp'
         elif 'fcn' in model_name_lower:
             self.model_type = 'fcn'
         else:
-            raise ValueError(f"无法从文件名 {self.model_name} 中识别模型类型，文件名必须包含 'yolo'、'unet' 或 'fcn' 关键字")
+            raise ValueError(f"无法从文件名 {self.model_name} 中识别模型类型，文件名必须包含 'yolo'、'unet'、'upp' 或 'fcn' 关键字")
         
         self._load_model(model_path)
         print(f"Successfully loaded {self.model_type} model: {self.model_name}")
@@ -36,7 +39,7 @@ class ModelDetector:
             self.model = YOLO(str(model_path), task='detect')
             self.model.to(self.device)
             self.model.eval()
-        elif self.model_type in ['unet', 'fcn']:
+        elif self.model_type in ['unet', 'fcn', 'upp']:
             try:
                 if self.model_type == 'fcn':
                     from torchvision.models.segmentation import fcn_resnet50
@@ -52,6 +55,18 @@ class ModelDetector:
                     # 加载UNet模型
                     import segmentation_models_pytorch as smp
                     self.model = smp.Unet(
+                        encoder_name="efficientnet-b4",
+                        encoder_weights=None,
+                        in_channels=3,
+                        classes=1,
+                        encoder_depth=5,
+                        decoder_channels=(256, 128, 64, 32, 16),
+                        decoder_use_batchnorm=True
+                    )
+                elif self.model_type == 'upp':
+                    # 加载UNet++模型
+                    import segmentation_models_pytorch as smp
+                    self.model = smp.UnetPlusPlus(
                         encoder_name="efficientnet-b4",
                         encoder_weights=None,
                         in_channels=3,
@@ -97,7 +112,7 @@ class ModelDetector:
     
     def detect(self, image, conf_thres=0.5, iou_thres=0.45, preview_size=None):
         image = self.preprocess_image(image)
-        
+        print(f'model_type: {self.model_type}')
         if self.model_type == 'yolo':
             print(f'Using IOU threshold: {iou_thres}')
             results = self.model(image, conf=conf_thres, iou=iou_thres, imgsz=image.size, verbose=False)
@@ -127,21 +142,38 @@ class ModelDetector:
                 if self.model_type == 'fcn':
                     output = output['out']
                 pred = torch.argmax(output, dim=1).squeeze().cpu().numpy()
+                pred = output.sigmoid().cpu().numpy()
             
+            # 计算平均置信度
+            avg_confidence = float(pred.mean())
             detections = [{
                 'label': 'building',
                 'class': 'building',
-                'confidence': 1.0,
+                'confidence': avg_confidence,
                 'segmentation': pred.tolist(),
                 'width': image.width,
                 'height': image.height
             }]
             
-            plotted_image = np.zeros((pred.shape[0], pred.shape[1], 3), dtype=np.uint8)
-            plotted_image[pred > 0] = [0, 255, 0]
-            plotted_image = cv2.resize(plotted_image, (image.width, image.height))
             original_image = np.array(image)
-            plotted_image = cv2.addWeighted(original_image, 0.7, plotted_image, 0.3, 0)
+
+            # 处理预测结果并绘制边框
+            def draw_contours(image, mask):
+                # 确保mask是uint8类型
+                if mask.ndim > 2:
+                    mask = mask.squeeze()  # 去除多余的维度
+                # 确保mask是uint8类型
+                mask = mask.astype(np.uint8)
+                # 使用RETR_TREE获取完整轮廓层次结构
+                contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+                result = image.copy()
+                # 使用更明显的红色(255,0,0)和更粗的边框(3px)
+                cv2.drawContours(result, contours, -1, (255, 0, 0), 2)
+                
+                return cv2.cvtColor(result, cv2.COLOR_BGR2RGB)
+            pred = (pred > 0.39).astype(np.uint8)
+            plotted_image = draw_contours(original_image.copy(), pred)
+            
         
         if preview_size:
             plotted_image = cv2.resize(plotted_image, preview_size, interpolation=cv2.INTER_AREA)
